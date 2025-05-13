@@ -169,24 +169,52 @@
         });
       }
 
-      // Fetch device model from backend
-      fetch('/api/device/model')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('device-model').textContent = data.result || 'Unknown';
-        })
-        .catch(() => {
-          document.getElementById('device-model').textContent = 'Unavailable';
-        });
-
-      // Fetch kernel version from backend (should run `uname -r`)
-      fetch('/api/device/kernel')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('kernel-version').textContent = data.result || 'Unknown';
-        })
-        .catch(() => {
-          document.getElementById('kernel-version').textContent = 'Unavailable';
+      // Function to fetch device model
+      function fetchDeviceModel() {
+          fetch('http://localhost:8080/api/device/model')
+              .then(response => response.json())
+              .then(data => {
+                  document.getElementById('model').textContent = data.result || 'Unknown';
+              })
+              .catch(error => {
+                  console.error('Error fetching device model:', error);
+                  document.getElementById('model').textContent = 'Error loading model';
+              });
+      }
+      // Function to fetch other device information
+        function fetchDeviceInfo() {
+            fetch('http://localhost:8080/api/device/kernel')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('kernel').textContent = data.result || 'Unknown';
+                })
+                .catch(error => {
+                    console.error('Error fetching kernel version:', error);
+                    document.getElementById('kernel').textContent = 'Error loading kernel version';
+                });
+            fetch('http://localhost:8080/api/device/sdk')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('sdk').textContent = data.result || 'Unknown';
+                })
+                .catch(error => {
+                    console.error('Error fetching SDK version:', error);
+                    document.getElementById('sdk').textContent = 'Error loading SDK version';
+                });
+            fetch('http://localhost:8080/api/device/chipset')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('chipset').textContent = data.result || 'Unknown';
+                })
+                .catch(error => {
+                    console.error('Error fetching chipset:', error);
+                    document.getElementById('chipset').textContent = 'Error loading chipset';
+                });
+        }
+        // Call the functions to fetch device info on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchDeviceModel();
+            fetchDeviceInfo();
         });
 
       // Check if module is installed properly
