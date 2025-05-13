@@ -196,6 +196,36 @@
           showToast('Refreshed!');
         });
       }
+
+      // Thermal toggle logic (if present)
+      const thermalToggle = document.querySelector('#thermal-toggle');
+      if (thermalToggle) {
+        thermalToggle.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            disableThermal();
+          }
+        });
+      }
+
+      // Example: Execute button logic (if present)
+      const button = document.getElementById('execute-button');
+      const output = document.getElementById('output');
+      if (button && output) {
+        button.addEventListener('click', async () => {
+          output.textContent = 'Executing...';
+          try {
+            const response = await fetch('/api/execute', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ command: 'your-command-here' })
+            });
+            const data = await response.json();
+            output.textContent = `Result: ${data.result}`;
+          } catch (error) {
+            output.textContent = `Error: ${error.message}`;
+          }
+        });
+      }
     });
 
     // Toast notification function
@@ -209,6 +239,25 @@
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0', 'pointer-events-none');
       }, 2000); // 2 seconds timeout
+    }
+
+    // Example: Disable thermal throttling via KernelSU WebUI API
+    async function disableThermal() {
+      try {
+        const response = await fetch('/api/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command: 'echo 0 > /sys/class/thermal/thermal_zone0/mode' })
+        });
+        const data = await response.json();
+        if (data.result) {
+          showToast('Thermal throttling disabled!');
+        } else {
+          showToast('Failed to disable thermal throttling.');
+        }
+      } catch (error) {
+        showToast('Error: ' + error.message);
+      }
     }
   </script>
 </body>
