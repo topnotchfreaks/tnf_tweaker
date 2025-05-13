@@ -20,19 +20,19 @@
     <div class="bg-zinc-800 rounded-xl p-4 mx-6 mt-4 space-y-3 text-sm shadow-inner">
       <div class="flex items-center space-x-2">
         <img src="assets/cpu.svg" alt="Kernel" class="w-5 h-5" />
-        <p>Kernel version<br><span class="text-gray-400">5.15.182-Zephyr-1.2.3-g8b0de7803dda</span></p>
+        <p>Kernel version<br><span id="kernel-version" class="text-gray-400">Loading...</span></p>
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/phone.svg" alt="Device" class="w-5 h-5" />
-        <p>Device model<br><span class="text-gray-400">Redmi Note 12 4G</span></p>
+        <p>Device model<br><span id="device-model" class="text-gray-400">Loading...</span></p>
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/settings.svg" alt="Module" class="w-5 h-5" />
-        <p>Module version<br><span class="text-gray-400">v0.0.1</span></p>
+        <p>Module version<br><span id="module-version" class="text-gray-400">Loading...</span></p>
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/check.svg" alt="Status" class="w-5 h-5" />
-        <p>Module Status<br><span class="text-green-400">Working</span></p>
+        <p>Module Status<br><span id="module-status" class="text-green-400">Working</span></p>
       </div>
     </div>
 
@@ -226,6 +226,58 @@
           }
         });
       }
+
+      // Fetch device model from backend
+      fetch('/api/device/model')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('device-model').textContent = data.model || 'Unknown';
+        })
+        .catch(() => {
+          document.getElementById('device-model').textContent = 'Unavailable';
+        });
+
+      // Fetch kernel version from backend (should run `uname -r`)
+      fetch('/api/device/kernel')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('kernel-version').textContent = data.version || 'Unknown';
+        })
+        .catch(() => {
+          document.getElementById('kernel-version').textContent = 'Unavailable';
+        });
+
+      // Check if module is installed properly
+      fetch('/api/module/status')
+        .then(res => res.json())
+        .then(data => {
+          const statusSpan = document.getElementById('module-status');
+          if (data.installed) {
+            statusSpan.textContent = 'Working';
+            statusSpan.classList.remove('text-red-400');
+            statusSpan.classList.add('text-green-400');
+          } else {
+            statusSpan.textContent = 'Fail';
+            statusSpan.classList.remove('text-green-400');
+            statusSpan.classList.add('text-red-400');
+          }
+        })
+        .catch(() => {
+          const statusSpan = document.getElementById('module-status');
+          statusSpan.textContent = 'Fail';
+          statusSpan.classList.remove('text-green-400');
+          statusSpan.classList.add('text-red-400');
+        });
+
+      // Fetch module version from GitHub releases
+      fetch('https://api.github.com/repos/topnotchfreaks/tnf_tweaker/releases/latest')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('module-version').textContent = data.tag_name || 'Unknown';
+        })
+        .catch(() => {
+          document.getElementById('module-version').textContent = 'Unavailable';
+        });
     });
 
     // Toast notification function
