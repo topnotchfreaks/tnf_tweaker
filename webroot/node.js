@@ -10,22 +10,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Kernel version
 app.get('/api/device/kernel', (req, res) => {
-  exec('uname -r', (err, stdout) => {
-    if (err) {
-      console.error('Kernel fetch failed:', err);
-      return res.status(500).json({ version: null });
-    }
+  exec('su -c "tnf_info get_kernel"', (err, stdout) => {
+    if (err) return res.status(500).json({ version: null });
     res.json({ version: stdout.trim() });
   });
 });
 
 // Device model
 app.get('/api/device/model', (req, res) => {
-  exec('getprop ro.product.model', (err, stdout) => {
-    if (err || !stdout.trim()) {
-      console.error('Model fetch failed:', err);
-      return res.status(500).json({ model: null });
-    }
+  exec('su -c "tnf_info get_model"', (err, stdout) => {
+    if (err) return res.status(500).json({ model: null });
     res.json({ model: stdout.trim() });
   });
 });

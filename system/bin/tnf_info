@@ -1,0 +1,14 @@
+#!/system/bin/sh
+
+case "$1" in
+  get_model)
+    getprop ro.product.model
+    ;;
+  get_kernel)
+    uname -r
+    ;;
+  *)
+    echo "Unknown command"
+    exit 1
+    ;;
+esac
