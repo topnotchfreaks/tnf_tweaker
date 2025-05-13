@@ -13,12 +13,6 @@ while true; do
     /api/device/kernel)
       VALUE=$(uname -r)
       ;;
-    /api/device/sdk)
-      VALUE=$(getprop ro.build.version.sdk)
-      ;;
-    /api/device/chipset)
-      VALUE=$(getprop ro.board.platform)
-      ;;
     *)
       VALUE="Unknown"
       ;;
