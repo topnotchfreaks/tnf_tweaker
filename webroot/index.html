@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TopNotchFreaks Tweaker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen flex justify-center items-center p-4">
+  <div class="w-[393px] bg-zinc-900 overflow-hidden shadow-2xl">
+    <!-- Header -->
+    <div class="flex justify-between items-center px-6 pt-6">
+      <h1 class="text-xl font-bold tracking-tight">TopNotchFreaks Tweaker</h1>
+      <button class="text-gray-400 hover:text-white">
+        <img src="assets/refresh.svg" alt="Menu" class="w-6 h-6" />
+      </button>
+    </div>
+
+    <!-- System Info Card -->
+    <div class="bg-zinc-800 rounded-xl p-4 mx-6 mt-4 space-y-3 text-sm shadow-inner">
+      <div class="flex items-center space-x-2">
+        <img src="assets/cpu.svg" alt="Kernel" class="w-5 h-5" />
+        <p>Kernel version<br><span class="text-gray-400">5.15.182-Zephyr-1.2.3-g8b0de7803dda</span></p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <img src="assets/phone.svg" alt="Device" class="w-5 h-5" />
+        <p>Device model<br><span class="text-gray-400">Redmi Note 12 4G</span></p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <img src="assets/settings.svg" alt="Module" class="w-5 h-5" />
+        <p>Module version<br><span class="text-gray-400">v0.0.1</span></p>
+      </div>
+      <div class="flex items-center space-x-2">
+        <img src="assets/check.svg" alt="Status" class="w-5 h-5" />
+        <p>Module Status<br><span class="text-green-400">Working</span></p>
+      </div>
+    </div>
+
+    <!-- Kernel Profiles -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm">Kernel Profiles Mode</label>
+      <div class="flex items-center">
+        <div id="profile-icon-container" class="relative flex items-center space-x-2 bg-zinc-800 px-4 py-2 rounded-xl shadow flex-1">
+          <img id="profile-icon" src="assets/settings.svg" alt="Profile" class="w-5 h-5 min-w-5 min-h-5 max-w-5 max-h-5 transition-all duration-200 object-contain" />
+          <select id="profile-select" class="bg-transparent focus:outline-none text-white pr-8 w-full">
+            <option value="powersave">Powersave</option>
+            <option value="balanced">Balanced</option>
+            <option value="performance">Performance</option>
+          </select>
+        </div>
+        <button class="ml-4 bg-red-500 text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition-transform whitespace-nowrap">
+          Apply
+        </button>
+      </div>
+    </div>
+
+    <!-- Bypass Charging -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm">Bypass Charging</label>
+      <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
+        <div class="flex items-center space-x-2">
+          <img src="assets/charging.svg" alt="Bypass Charging" class="w-5 h-5" />
+          <span>Disabled</span>
+        </div>
+        <!-- Toggle Switch -->
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
+          <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Thermal Mode -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm">Thermal Mode</label>
+      <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
+        <div class="flex items-center space-x-2">
+          <img src="assets/heat.svg" alt="Thermal" class="w-5 h-5" />
+          <span>Disable throttling</span>
+        </div>
+        <!-- Toggle Switch -->
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
+          <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Other Tweaks -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm">Other Tweaks</label>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
+          <div class="flex items-center space-x-2">
+            <img src="assets/optimize.svg" alt="Dex Optimization" class="w-5 h-5" />
+            <span>Dex Optimization</span>
+          </div>
+          <!-- Toggle Switch -->
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
+            <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
+          </label>
+        </div>
+        <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
+          <div class="flex items-center space-x-2">
+            <img src="assets/optimize.svg" alt="ART Optimization" class="w-5 h-5" />
+            <span>ART Optimization</span>
+          </div>
+          <!-- Toggle Switch -->
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer">
+            <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
+            <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Modules -->
+    <div class="px-6 mt-6 mb-8">
+      <label class="block mb-2 font-semibold text-sm">About Modules</label>
+      <div class="bg-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between shadow">
+        <div class="text-sm">
+          <p>Author<br><span class="text-gray-400">Belowzeroiq</span></p>
+          <p>Telegram<br><span class="text-gray-400">t.me/belowzeroiq</span></p>
+        </div>
+        <div class="flex flex-col space-y-3 items-end ml-4">
+          <a href="#" class="hover:text-white transition-colors" title="GitHub">
+            <img src="assets/github.svg" alt="Author" class="w-6 h-6 inline" style="filter: invert(1) brightness(2);" />
+          </a>
+          <a href="#" class="hover:text-white transition-colors" title="Telegram">
+            <img src="assets/telegram.svg" alt="Telegram" class="w-6 h-6 inline" style="filter: invert(1) brightness(2);" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // filepath: /home/env/Documents/GitHub/tnf_tweaker/webroot/index.html
+    document.addEventListener('DOMContentLoaded', () => {
+      const profileSelect = document.getElementById('profile-select');
+      const profileIcon = document.getElementById('profile-icon');
+      const icons = {
+        powersave: 'assets/powersave.svg',
+        balanced: 'assets/balanced.svg',
+        performance: 'assets/performance.svg'
+      };
+      profileSelect.addEventListener('change', (e) => {
+        profileIcon.src = icons[e.target.value] || icons.balanced;
+      });
+      // Set initial icon
+      profileIcon.src = icons[profileSelect.value] || icons.balanced;
+    });
+  </script>
+</body>
+</html>
