@@ -11,7 +11,7 @@
     <!-- Header -->
     <div class="flex justify-between items-center px-6 pt-6">
       <h1 class="text-xl font-bold tracking-tight">TopNotchFreaks Tweaker</h1>
-      <button class="text-gray-400 hover:text-white">
+      <button id="refresh-btn" class="text-gray-400 hover:text-white">
         <img src="assets/refresh.svg" alt="Menu" class="w-6 h-6" />
       </button>
     </div>
@@ -48,7 +48,7 @@
             <option value="performance">Performance</option>
           </select>
         </div>
-        <button class="ml-4 bg-red-500 text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition-transform whitespace-nowrap">
+        <button id="apply-profile" class="ml-4 bg-red-500 text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition-transform whitespace-nowrap">
           Apply
         </button>
       </div>
@@ -60,11 +60,11 @@
       <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
         <div class="flex items-center space-x-2">
           <img src="assets/charging.svg" alt="Bypass Charging" class="w-5 h-5" />
-          <span>Disabled</span>
+          <span id="bypass-status">Disabled</span>
         </div>
         <!-- Toggle Switch -->
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" class="sr-only peer">
+          <input id="bypass-toggle" type="checkbox" class="sr-only peer">
           <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
           <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
         </label>
@@ -139,11 +139,14 @@
     </div>
   </div>
 
+  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-50 bg-zinc-800 text-white px-6 py-3 rounded-xl shadow-lg opacity-0 pointer-events-none transition-all duration-300"></div>
+
   <script>
     // filepath: /home/env/Documents/GitHub/tnf_tweaker/webroot/index.html
     document.addEventListener('DOMContentLoaded', () => {
       const profileSelect = document.getElementById('profile-select');
       const profileIcon = document.getElementById('profile-icon');
+      const applyProfileBtn = document.getElementById('apply-profile');
       const icons = {
         powersave: 'assets/powersave.svg',
         balanced: 'assets/balanced.svg',
@@ -151,10 +154,62 @@
       };
       profileSelect.addEventListener('change', (e) => {
         profileIcon.src = icons[e.target.value] || icons.balanced;
+        showToast(`Profile set to ${e.target.options[e.target.selectedIndex].text}`);
       });
       // Set initial icon
       profileIcon.src = icons[profileSelect.value] || icons.balanced;
+
+      // Apply button notification
+      if (applyProfileBtn) {
+        applyProfileBtn.addEventListener('click', () => {
+          const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
+          showToast(`Applied profile: ${selectedText}`);
+        });
+      }
+
+      // Bypass Charging toggle logic
+      const bypassToggle = document.getElementById('bypass-toggle');
+      const bypassStatus = document.getElementById('bypass-status');
+      if (bypassToggle && bypassStatus) {
+        bypassToggle.addEventListener('change', (e) => {
+          bypassStatus.textContent = e.target.checked ? 'Enabled' : 'Disabled';
+          showToast(`Bypass Charging ${e.target.checked ? 'enabled' : 'disabled'}`);
+        });
+      }
+
+      // Attach to all other toggle switches
+      document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+        // Skip bypass toggle (already handled)
+        if (toggle.id === 'bypass-toggle') return;
+        toggle.addEventListener('change', (e) => {
+          const label = e.target.closest('.flex.items-center.space-x-2')?.innerText ||
+                        e.target.closest('.flex.items-center')?.innerText ||
+                        'Setting';
+          showToast(`${label.trim()} ${e.target.checked ? 'enabled' : 'disabled'}`);
+        });
+      });
+
+      // Refresh button notification
+      const refreshBtn = document.getElementById('refresh-btn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+          showToast('Refreshed!');
+        });
+      }
     });
+
+    // Toast notification function
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      clearTimeout(window._toastTimeout);
+      window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2000); // 2 seconds timeout
+    }
   </script>
 </body>
 </html>
