@@ -1,14 +1,9 @@
 #!/system/bin/sh
 
 case "$1" in
-  get_model)
-    getprop ro.product.model
-    ;;
-  get_kernel)
-    uname -r
-    ;;
-  *)
-    echo "Unknown command"
-    exit 1
-    ;;
+  get_model) getprop ro.product.model ;;
+  get_kernel) uname -r ;;
+  get_sdk) getprop ro.build.version.sdk ;;
+  get_chipset) getprop ro.board.platform ;;
+  *) echo "Unknown" ;;
 esac

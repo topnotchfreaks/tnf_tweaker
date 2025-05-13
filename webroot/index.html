@@ -173,7 +173,7 @@
       fetch('/api/device/model')
         .then(res => res.json())
         .then(data => {
-          document.getElementById('device-model').textContent = data.model || 'Unknown';
+          document.getElementById('device-model').textContent = data.result || 'Unknown';
         })
         .catch(() => {
           document.getElementById('device-model').textContent = 'Unavailable';
@@ -183,7 +183,7 @@
       fetch('/api/device/kernel')
         .then(res => res.json())
         .then(data => {
-          document.getElementById('kernel-version').textContent = data.version || 'Unknown';
+          document.getElementById('kernel-version').textContent = data.result || 'Unknown';
         })
         .catch(() => {
           document.getElementById('kernel-version').textContent = 'Unavailable';
