@@ -1,4 +1,2 @@
 #!/system/bin/sh
-
-# Start Node.js backend for WebUI
-node /data/adb/modules/tnf_tweaker/daemon.js &
+/data/adb/modules/tnf_tweaker/tnf_httpd.sh &
