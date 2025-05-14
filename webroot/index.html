@@ -64,7 +64,7 @@
         </div>
         <!-- Toggle Switch -->
         <label class="relative inline-flex items-center cursor-pointer">
-          <input id="thermal-toggle" type="checkbox" class="sr-only peer">
+          <input id="thermal-toggle" type="checkbox" class="sr-only peer" checked>
           <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
           <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
         </label>
@@ -161,7 +161,8 @@
 
       // Toast for toggles
       document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
-        if (toggle.id === 'bypass-toggle') return;
+        // Skip bypass toggle and thermal toggle (handled separately)
+        if (toggle.id === 'bypass-toggle' || toggle.id === 'thermal-toggle') return;
         toggle.addEventListener('change', (e) => {
           const label = e.target.closest('.flex.items-center.space-x-2')?.innerText ||
                         e.target.closest('.flex.items-center')?.innerText ||
@@ -187,13 +188,15 @@
       if (thermalToggle && thermalStatus) {
         thermalToggle.addEventListener('change', async (e) => {
           if (e.target.checked) {
-            const result = await setThermalThrottling(false);
-            thermalStatus.textContent = result ? 'Disabled' : 'Enabled';
-            showToast(`Thermal Throttling ${result ? 'disabled' : 'failed to disable'}`);
-          } else {
+            // Switch ON: Enable thermal throttling
             const result = await setThermalThrottling(true);
-            thermalStatus.textContent = result ? 'Enabled' : 'Disabled';
+            thermalStatus.textContent = result ? 'Enabled' : 'Failed';
             showToast(`Thermal Throttling ${result ? 'enabled' : 'failed to enable'}`);
+          } else {
+            // Switch OFF: Disable thermal throttling
+            const result = await setThermalThrottling(false);
+            thermalStatus.textContent = result ? 'Disabled' : 'Failed';
+            showToast(`Thermal Throttling ${result ? 'disabled' : 'failed to disable'}`);
           }
         });
       }
@@ -285,6 +288,7 @@
             `setprop init.svc.thermal_mnt_hal_service running`,
             `setprop init.svc.thermal-engine running`,
             `setprop init.svc.mi-thermald running`,
+            `setprop init.svc.mi_thermald running`,
             `setprop init.svc.thermalloadalgod running`,
             `setprop init.svc.thermalservice running`,
             `setprop init.svc.thermal-hal running`,
@@ -311,6 +315,7 @@
             `setprop init.svc.thermal_mnt_hal_service stopped`,
             `setprop init.svc.thermal-engine stopped`,
             `setprop init.svc.mi-thermald stopped`,
+            `setprop init.svc.mi_thermald stopped`,
             `setprop init.svc.thermalloadalgod stopped`,
             `setprop init.svc.thermalservice stopped`,
             `setprop init.svc.thermal-hal stopped`,
