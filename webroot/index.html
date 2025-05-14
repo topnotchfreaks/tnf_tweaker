@@ -145,7 +145,11 @@
         applyProfileBtn.addEventListener('click', () => {
           const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
           setKProfilesMode(profileSelect.value)
-            .then(() => showToast(`Applied profile: ${selectedText}`))
+            .then(() => {
+              showToast(`Applied profile: ${selectedText}`);
+              // Save the selected profile persistently for boot
+              exec(`echo "profile=${profileSelect.value}" > /data/adb/tnftweaker/tweaker_config.conf`);
+            })
             .catch(() => showToast('Failed to apply profile'));
         });
       }
@@ -192,11 +196,13 @@
             const result = await setThermalThrottling(true);
             thermalStatus.textContent = result ? 'Enabled' : 'Failed';
             showToast(`Thermal Throttling ${result ? 'enabled' : 'failed to enable'}`);
+            exec(`echo "thermal=enabled" >> /data/adb/tnftweaker/tweaker_config.conf`);
           } else {
             // Switch OFF: Disable thermal throttling
             const result = await setThermalThrottling(false);
             thermalStatus.textContent = result ? 'Disabled' : 'Failed';
             showToast(`Thermal Throttling ${result ? 'disabled' : 'failed to disable'}`);
+            exec(`echo "thermal=disabled" >> /data/adb/tnftweaker/tweaker_config.conf`);
           }
         });
       }
