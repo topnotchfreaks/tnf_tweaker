@@ -270,11 +270,65 @@
     // Set thermal throttling state using KernelSU exec
     async function setThermalThrottling(enable) {
       try {
-        const command = enable
-          ? 'echo enabled > /sys/class/thermal/thermal_zone0/mode'
-          : 'echo disabled > /sys/class/thermal/thermal_zone0/mode';
-        const { stdout } = await exec(command);
-        return stdout !== undefined;
+        let commands = [];
+        if (enable) {
+          // Enable thermal throttling
+          commands = [
+            `echo enabled > /sys/class/thermal/thermal_zone*/mode`,
+            `echo 1 > /sys/kernel/sched_boost`,
+            `echo Y > /sys/module/msm_thermal/parameters/enabled`,
+            `echo 1 > /sys/module/msm_thermal/core_control/enabled`,
+            `echo 1 > /sys/kernel/msm_thermal/enabled`,
+            `setprop init.svc.thermal running`,
+            `setprop init.svc.thermal-managers running`,
+            `setprop init.svc.thermal_manager running`,
+            `setprop init.svc.thermal_mnt_hal_service running`,
+            `setprop init.svc.thermal-engine running`,
+            `setprop init.svc.mi-thermald running`,
+            `setprop init.svc.thermalloadalgod running`,
+            `setprop init.svc.thermalservice running`,
+            `setprop init.svc.thermal-hal running`,
+            `setprop init.svc.vendor.thermal-symlinks running`,
+            `setprop init.svc.android.thermal-hal running`,
+            `setprop init.svc.vendor.thermal-hal running`,
+            `setprop init.svc.thermal-manager running`,
+            `setprop init.svc.vendor-thermal-hal-1-0 running`,
+            `setprop init.svc.vendor.thermal-hal-1-0 running`,
+            `setprop init.svc.vendor.thermal-hal-2-0.mtk running`,
+            `setprop init.svc.vendor.thermal-hal-2-0 running`
+          ];
+        } else {
+          // Disable thermal throttling
+          commands = [
+            `echo 0 > /sys/class/thermal/thermal_zone*/mode`,
+            `echo 0 > /sys/kernel/sched_boost`,
+            `echo N > /sys/module/msm_thermal/parameters/enabled`,
+            `echo 0 > /sys/module/msm_thermal/core_control/enabled`,
+            `echo 0 > /sys/kernel/msm_thermal/enabled`,
+            `setprop init.svc.thermal stopped`,
+            `setprop init.svc.thermal-managers stopped`,
+            `setprop init.svc.thermal_manager stopped`,
+            `setprop init.svc.thermal_mnt_hal_service stopped`,
+            `setprop init.svc.thermal-engine stopped`,
+            `setprop init.svc.mi-thermald stopped`,
+            `setprop init.svc.thermalloadalgod stopped`,
+            `setprop init.svc.thermalservice stopped`,
+            `setprop init.svc.thermal-hal stopped`,
+            `setprop init.svc.vendor.thermal-symlinks stopped`,
+            `setprop init.svc.android.thermal-hal stopped`,
+            `setprop init.svc.vendor.thermal-hal stopped`,
+            `setprop init.svc.thermal-manager stopped`,
+            `setprop init.svc.vendor-thermal-hal-1-0 stopped`,
+            `setprop init.svc.vendor.thermal-hal-1-0 stopped`,
+            `setprop init.svc.vendor.thermal-hal-2-0.mtk stopped`,
+            `setprop init.svc.vendor.thermal-hal-2-0 stopped`
+          ];
+        }
+        // Run all commands sequentially
+        for (const cmd of commands) {
+          await exec(cmd);
+        }
+        return true;
       } catch {
         return false;
       }
