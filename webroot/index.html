@@ -95,7 +95,32 @@
 
   <script>
     // filepath: /home/env/Documents/GitHub/tnf_tweaker/webroot/index.html
+    // --- KernelSU JS API helpers ---
+    let callbackCounter = 0;
+    function getUniqueCallbackName(prefix) {
+      return `${prefix}_callback_${Date.now()}_${callbackCounter++}`;
+    }
+
+    function exec(command, options) {
+      if (typeof options === "undefined") options = {};
+      return new Promise((resolve, reject) => {
+        const callbackFuncName = getUniqueCallbackName("exec");
+        window[callbackFuncName] = (errno, stdout, stderr) => {
+          resolve({ errno, stdout, stderr });
+          delete window[callbackFuncName];
+        };
+        try {
+          ksu.exec(command, JSON.stringify(options), callbackFuncName);
+        } catch (error) {
+          reject(error);
+          delete window[callbackFuncName];
+        }
+      });
+    }
+
+    // --- UI logic ---
     document.addEventListener('DOMContentLoaded', () => {
+      // Profile icon logic
       const profileSelect = document.getElementById('profile-select');
       const profileIcon = document.getElementById('profile-icon');
       const applyProfileBtn = document.getElementById('apply-profile');
@@ -104,24 +129,22 @@
         balanced: 'assets/balanced.svg',
         performance: 'assets/performance.svg'
       };
-      profileSelect.addEventListener('change', (e) => {
-        profileIcon.src = icons[e.target.value] || icons.balanced;
-        showToast(`Profile set to ${e.target.options[e.target.selectedIndex].text}`);
-      });
-      // Set initial icon
-      profileIcon.src = icons[profileSelect.value] || icons.balanced;
-
-      // Apply button notification
-      if (applyProfileBtn) {
+      if (profileSelect && profileIcon) {
+        profileSelect.addEventListener('change', (e) => {
+          profileIcon.src = icons[e.target.value] || icons.balanced;
+          showToast(`Profile set to ${e.target.options[e.target.selectedIndex].text}`);
+        });
+        profileIcon.src = icons[profileSelect.value] || icons.balanced;
+      }
+      if (applyProfileBtn && profileSelect) {
         applyProfileBtn.addEventListener('click', () => {
           const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
           showToast(`Applied profile: ${selectedText}`);
         });
       }
 
-      // Attach to all other toggle switches
+      // Toast for toggles
       document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
-        // Skip bypass toggle (already handled)
         if (toggle.id === 'bypass-toggle') return;
         toggle.addEventListener('change', (e) => {
           const label = e.target.closest('.flex.items-center.space-x-2')?.innerText ||
@@ -136,118 +159,33 @@
       if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
           showToast('Refreshed!');
-        });
-      }
-
-      // Thermal toggle logic (if present)
-      const thermalToggle = document.querySelector('#thermal-toggle');
-      if (thermalToggle) {
-        thermalToggle.addEventListener('change', (e) => {
-          if (e.target.checked) {
-            disableThermal();
-          }
-        });
-      }
-
-      // Example: Execute button logic (if present)
-      const button = document.getElementById('execute-button');
-      const output = document.getElementById('output');
-      if (button && output) {
-        button.addEventListener('click', async () => {
-          output.textContent = 'Executing...';
-          try {
-            const response = await fetch('/api/execute', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ command: 'your-command-here' })
-            });
-            const data = await response.json();
-            output.textContent = `Result: ${data.result}`;
-          } catch (error) {
-            output.textContent = `Error: ${error.message}`;
-          }
-        });
-      }
-
-      function fetchDeviceInfo() {
-      // Fetch Kernel Version
-      fetch('http://localhost:8080/api/device/kernel')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('kernel-version').textContent = data.result || 'Unknown';
-        })
-        .catch(error => {
-            console.error('Error fetching kernel version:', error);
-            document.getElementById('kernel-version').textContent = 'Error loading';
-        });
-
-      // Fetch Device Model
-      fetch('http://localhost:8080/api/device/model')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('device-model').textContent = data.result || 'Unknown';
-        })
-        .catch(error => {
-            console.error('Error fetching device model:', error);
-            document.getElementById('device-model').textContent = 'Error loading';
-        });
-
-      // Call the function to fetch device info on page load
-      document.addEventListener('DOMContentLoaded', function() {
           fetchDeviceInfo();
-      });
-
-
-      // Check if module is installed properly
-      fetch('/api/module/status')
-        .then(res => res.json())
-        .then(data => {
-          const statusSpan = document.getElementById('module-status');
-          if (data.installed) {
-            statusSpan.textContent = 'Working';
-            statusSpan.classList.remove('text-red-400');
-            statusSpan.classList.add('text-green-400');
-          } else {
-            statusSpan.textContent = 'Fail';
-            statusSpan.classList.remove('text-green-400');
-            statusSpan.classList.add('text-red-400');
-          }
-        })
-        .catch(() => {
-          const statusSpan = document.getElementById('module-status');
-          statusSpan.textContent = 'Fail';
-          statusSpan.classList.remove('text-green-400');
-          statusSpan.classList.add('text-red-400');
+          fetchModuleStatus();
+          fetchModuleVersion();
         });
+      }
 
-      // Fetch module version from GitHub releases
-      fetch('https://api.github.com/repos/topnotchfreaks/tnf_tweaker/releases/latest')
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('module-version').textContent = data.tag_name || 'Unknown';
-        })
-        .catch(() => {
-          document.getElementById('module-version').textContent = 'Unavailable';
-        });
-
-      // Thermal Throttling toggle logic
-      //const thermalToggle = document.getElementById('thermal-toggle');
+      // Thermal toggle logic
+      const thermalToggle = document.getElementById('thermal-toggle');
       const thermalStatus = document.getElementById('thermal-status');
       if (thermalToggle && thermalStatus) {
         thermalToggle.addEventListener('change', async (e) => {
           if (e.target.checked) {
-            // Disable thermal throttling
             const result = await setThermalThrottling(false);
             thermalStatus.textContent = result ? 'Disabled' : 'Enabled';
             showToast(`Thermal Throttling ${result ? 'disabled' : 'failed to disable'}`);
           } else {
-            // Enable thermal throttling
             const result = await setThermalThrottling(true);
             thermalStatus.textContent = result ? 'Enabled' : 'Disabled';
             showToast(`Thermal Throttling ${result ? 'enabled' : 'failed to enable'}`);
           }
         });
       }
+
+      // Initial fetches
+      fetchDeviceInfo();
+      fetchModuleStatus();
+      fetchModuleVersion();
     });
 
     // Toast notification function
@@ -260,41 +198,67 @@
       window._toastTimeout = setTimeout(() => {
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0', 'pointer-events-none');
-      }, 2000); // 2 seconds timeout
+      }, 2000);
     }
 
-    // Example: Disable thermal throttling via KernelSU WebUI API
-    async function disableThermal() {
-      try {
-        const response = await fetch('/api/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ command: 'echo 0 > /sys/class/thermal/thermal_zone0/mode' })
-        });
-        const data = await response.json();
-        if (data.result) {
-          showToast('Thermal throttling disabled!');
+    // Fetch kernel version and device model using KernelSU exec
+    function fetchDeviceInfo() {
+      // Kernel version
+      exec('uname -r').then(({ stdout }) => {
+        document.getElementById('kernel-version').textContent = stdout.trim() || 'Unknown';
+      }).catch(() => {
+        document.getElementById('kernel-version').textContent = 'Error loading';
+      });
+
+      // Device model
+      exec('getprop ro.product.vendor.model').then(({ stdout }) => {
+        document.getElementById('device-model').textContent = stdout.trim() || 'Unknown';
+      }).catch(() => {
+        document.getElementById('device-model').textContent = 'Error loading';
+      });
+    }
+
+    // Check if module is installed properly (example: check for a file or command)
+    function fetchModuleStatus() {
+      exec('which tnf_info').then(({ stdout }) => {
+        const statusSpan = document.getElementById('module-status');
+        if (stdout && stdout.trim()) {
+          statusSpan.textContent = 'Working';
+          statusSpan.classList.remove('text-red-400');
+          statusSpan.classList.add('text-green-400');
         } else {
-          showToast('Failed to disable thermal throttling.');
+          statusSpan.textContent = 'Fail';
+          statusSpan.classList.remove('text-green-400');
+          statusSpan.classList.add('text-red-400');
         }
-      } catch (error) {
-        showToast('Error: ' + error.message);
-      }
+      }).catch(() => {
+        const statusSpan = document.getElementById('module-status');
+        statusSpan.textContent = 'Fail';
+        statusSpan.classList.remove('text-green-400');
+        statusSpan.classList.add('text-red-400');
+      });
     }
 
-    // Set thermal throttling state
+    // Fetch module version from GitHub releases (still uses fetch, not exec)
+    function fetchModuleVersion() {
+      fetch('https://api.github.com/repos/topnotchfreaks/tnf_tweaker/releases/latest')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('module-version').textContent = data.tag_name || 'Unknown';
+        })
+        .catch(() => {
+          document.getElementById('module-version').textContent = 'Unavailable';
+        });
+    }
+
+    // Set thermal throttling state using KernelSU exec
     async function setThermalThrottling(enable) {
       try {
         const command = enable
           ? 'echo enabled > /sys/class/thermal/thermal_zone0/mode'
           : 'echo disabled > /sys/class/thermal/thermal_zone0/mode';
-        const response = await fetch('/api/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ command })
-        });
-        const data = await response.json();
-        return !!data.result;
+        const { stdout } = await exec(command);
+        return stdout !== undefined;
       } catch {
         return false;
       }
