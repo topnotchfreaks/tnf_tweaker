@@ -118,6 +118,17 @@
       });
     }
 
+    // Function to set kernel profile mode
+    function setKProfilesMode(mode) {
+      // Map mode string to value
+      let value = "3"; // Default to Performance
+      if (mode === "powersave") value = "1";
+      else if (mode === "balanced") value = "2";
+      else if (mode === "performance") value = "3";
+      // Execute the shell command
+      return exec(`echo ${value} > /sys/kernel/kprofiles/kp_mode`);
+    }
+
     // --- UI logic ---
     document.addEventListener('DOMContentLoaded', () => {
       // Profile icon logic
@@ -129,18 +140,23 @@
         balanced: 'assets/balanced.svg',
         performance: 'assets/performance.svg'
       };
+
+      if (applyProfileBtn && profileSelect) {
+        applyProfileBtn.addEventListener('click', () => {
+          const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
+          setKProfilesMode(profileSelect.value)
+            .then(() => showToast(`Applied profile: ${selectedText}`))
+            .catch(() => showToast('Failed to apply profile'));
+        });
+      }
+
+      // Remove this block to prevent auto-applying on select change:
       if (profileSelect && profileIcon) {
         profileSelect.addEventListener('change', (e) => {
           profileIcon.src = icons[e.target.value] || icons.balanced;
           showToast(`Profile set to ${e.target.options[e.target.selectedIndex].text}`);
         });
         profileIcon.src = icons[profileSelect.value] || icons.balanced;
-      }
-      if (applyProfileBtn && profileSelect) {
-        applyProfileBtn.addEventListener('click', () => {
-          const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
-          showToast(`Applied profile: ${selectedText}`);
-        });
       }
 
       // Toast for toggles
