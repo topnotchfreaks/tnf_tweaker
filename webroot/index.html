@@ -32,7 +32,7 @@
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/check.svg" alt="Status" class="w-5 h-5" />
-        <p>Module Status<br><span id="module-status" class="text-green-400">BETA</span></p>
+        <p>Module Status<br><span id="module-status" class="text-gray-400">BETA</span></p>
       </div>
     </div>
 
@@ -118,6 +118,57 @@
       });
     }
 
+    async function updateTweakerConfig(key, value) {
+    const path = "/data/adb/tnftweaker/tweaker_config.conf";
+
+      try {
+        const { stdout } = await exec(`cat ${path} || touch ${path} && echo ""`);
+        const lines = stdout.split("\n").filter(Boolean);
+        let updated = false;
+      
+        // Update line if key exists
+        const newLines = lines.map(line => {
+          if (line.startsWith(`${key}=`)) {
+            updated = true;
+            return `${key}=${value}`;
+          }
+          return line;
+        });
+      
+        if (!updated) {
+          newLines.push(`${key}=${value}`);
+        }
+      
+        const newContent = newLines.join("\n");
+      
+        await exec(`echo "${newContent}" > ${path}`);
+      } catch (err) {
+        console.error("Failed to update tweaker_config.conf:", err);
+      }
+    }
+
+    // Function to load the current kernel profile
+    const profileSelect = document.getElementById('profileSelect');
+    const profileIcon = document.getElementById('profileIcon');
+    const icons = {
+      powersave: 'icons/powersave.png',
+      balanced: 'icons/balanced.png',
+      performance: 'icons/performance.png',
+    };
+
+    async function loadCurrentProfile() {
+      try {
+        const { stdout } = await exec('cat /sys/kernel/kprofiles/kp_mode');
+        const val = stdout.trim();
+        const map = { '1': 'powersave', '2': 'balanced', '3': 'performance' };
+        const profile = map[val] || 'balanced';
+        profileSelect.value = profile;
+        profileIcon.src = icons[profile];
+      } catch (err) {
+        console.error("Failed to read kernel profile:", err);
+      }
+    }
+
     // Function to set kernel profile mode
     function setKProfilesMode(mode) {
       // Map mode string to value
@@ -185,24 +236,30 @@
         });
       }
 
+    // Load current profile on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      profileSelect.addEventListener("change", async () => {
+        const selected = profileSelect.value;
+        await setKProfilesMode(selected);
+        await updateTweakerConfig("profile", selected);
+      });
+    
+      loadCurrentProfile(); // This alone is enough
+    });
+
       // Thermal toggle logic
       const thermalToggle = document.getElementById('thermal-toggle');
       const thermalStatus = document.getElementById('thermal-status');
+        
       if (thermalToggle && thermalStatus) {
         thermalToggle.addEventListener('change', async (e) => {
-          if (e.target.checked) {
-            // Switch ON: Enable thermal throttling
-            const result = await setThermalThrottling(true);
-            thermalStatus.textContent = result ? 'Enabled' : 'Failed';
-            showToast(`Thermal Throttling ${result ? 'enabled' : 'failed to enable'}`);
-            exec(`echo "thermal=enabled" >> /data/adb/tnftweaker/tweaker_config.conf`);
-          } else {
-            // Switch OFF: Disable thermal throttling
-            const result = await setThermalThrottling(false);
-            thermalStatus.textContent = result ? 'Disabled' : 'Failed';
-            showToast(`Thermal Throttling ${result ? 'disabled' : 'failed to disable'}`);
-            exec(`echo "thermal=disabled" >> /data/adb/tnftweaker/tweaker_config.conf`);
-          }
+          const enabled = e.target.checked;
+          const result = await setThermalThrottling(enabled);
+        
+          thermalStatus.textContent = result ? (enabled ? 'Enabled' : 'Disabled') : 'Failed';
+          showToast(`Thermal Throttling ${result ? (enabled ? 'enabled' : 'disabled') : 'failed'}`);
+        
+          await updateTweakerConfig("thermal", enabled ? "enabled" : "disabled");
         });
       }
 
@@ -281,7 +338,6 @@
             `setprop init.svc.thermal-manager running`,
             `setprop init.svc.vendor-thermal-hal-1-0 running`,
             `setprop init.svc.vendor.thermal-hal-1-0 running`,
-            `setprop init.svc.vendor.thermal-hal-2-0.mtk running`,
             `setprop init.svc.vendor.thermal-hal-2-0 running`
           ];
         } else {
@@ -308,7 +364,6 @@
             `setprop init.svc.thermal-manager stopped`,
             `setprop init.svc.vendor-thermal-hal-1-0 stopped`,
             `setprop init.svc.vendor.thermal-hal-1-0 stopped`,
-            `setprop init.svc.vendor.thermal-hal-2-0.mtk stopped`,
             `setprop init.svc.vendor.thermal-hal-2-0 stopped`
           ];
         }
