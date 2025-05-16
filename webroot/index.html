@@ -198,7 +198,9 @@
     }
 
     // --- UI logic ---
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadTweakerConfig();
+
       // Profile icon logic
       const profileSelect = document.getElementById('profile-select');
       const profileIcon = document.getElementById('profile-icon');
@@ -438,6 +440,61 @@
         return false;
       }
     }
+
+    async function loadTweakerConfig() {
+      const path = "/data/adb/tnftweaker/tweaker_config.conf";
+      try {
+        const { stdout } = await exec(`cat ${path} || echo ""`);
+        const lines = stdout.split("\n").filter(Boolean);
+        let profile = "balanced";
+        let thermal = "enabled";
+
+        lines.forEach(line => {
+          if (line.startsWith("profile=")) profile = line.split("=")[1];
+          if (line.startsWith("thermal=")) thermal = line.split("=")[1];
+          // bypasscharging= is ignored
+        });
+
+        // Set kernel profile select and icon
+        const profileSelect = document.getElementById('profile-select');
+        const profileIcon = document.getElementById('profile-icon');
+        if (profileSelect) {
+          profileSelect.value = profile;
+          if (profileIcon) {
+            const icons = {
+              powersave: 'assets/powersave.svg',
+              balanced: 'assets/balanced.svg',
+              performance: 'assets/performance.svg'
+            };
+            profileIcon.src = icons[profile] || icons.balanced;
+          }
+          // Apply the profile to the system
+          await setKProfilesMode(profile);
+        }
+
+        // Set thermal toggle and status
+        const thermalToggle = document.getElementById('thermal-toggle');
+        const thermalStatus = document.getElementById('thermal-status');
+        if (thermalToggle && thermalStatus) {
+          thermalToggle.checked = (thermal === "enabled");
+          await setThermalThrottling(thermal === "enabled");
+          thermalStatus.textContent = (thermal === "enabled") ? "Enabled" : "Disabled";
+        }
+
+        // Set bypass charging toggle and status
+        const chargingToggle = document.getElementById('charging-toggle');
+        const chargingStatus = document.getElementById('charging-status');
+        if (chargingToggle && chargingStatus) {
+          chargingToggle.checked = (bypasscharging === "enabled");
+          await setBypassCharging(bypasscharging === "enabled");
+          chargingStatus.textContent = (bypasscharging === "enabled") ? "Enabled" : "Disabled";
+        }
+      } catch (err) {
+        console.error("Failed to load tweaker_config.conf:", err);
+      }
+    }
+
+    loadTweakerConfig();
   </script>
 </body>
 </html>
