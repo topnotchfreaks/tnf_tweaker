@@ -71,6 +71,23 @@
       </div>
     </div>
 
+    <!-- Bypass Charging -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm">Bypass Charging</label>
+      <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
+        <div class="flex items-center space-x-2">
+          <img src="assets/charging.svg" alt="Bypass" class="w-5 h-5" />
+          <span id="charging-status">Disabled</span>
+        </div>
+        <!-- Toggle Switch -->
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input id="charging-toggle" type="checkbox" class="sr-only peer">
+          <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
+          <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
+        </label>
+      </div>
+    </div>
+
     <!-- About Modules -->
     <div class="px-6 mt-6 mb-8">
       <label class="block mb-2 font-semibold text-sm">About Modules</label>
@@ -224,6 +241,14 @@
                         'Setting';
           showToast(`${label.trim()} ${e.target.checked ? 'enabled' : 'disabled'}`);
         });
+        // Skip bypass toggle and charging toggle (handled separately)
+        if (toggle.id === 'bypass-toggle' || toggle.id === 'charging-toggle') return;
+        toggle.addEventListener('change', (e) => {
+          const label = e.target.closest('.flex.items-center.space-x-2')?.innerText ||
+                        e.target.closest('.flex.items-center')?.innerText ||
+                        'Setting';
+          showToast(`${label.trim()} ${e.target.checked ? 'enabled' : 'disabled'}`);
+        });
       });
 
       // Refresh button notification
@@ -260,6 +285,21 @@
           showToast(`Thermal Throttling ${result ? (enabled ? 'enabled' : 'disabled') : 'failed'}`);
         
           await updateTweakerConfig("thermal", enabled ? "enabled" : "disabled");
+        });
+      }
+
+      // Bypass Charging toggle logic
+      const chargingToggle = document.getElementById('charging-toggle');
+      const chargingStatus = document.getElementById('charging-status');
+        
+      if (chargingToggle && chargingStatus) {
+        chargingToggle.addEventListener('change', async (e) => {
+          const enabled = e.target.checked;
+          const result = await setBypassCharging(enabled);
+        
+          chargingStatus.textContent = result ? (enabled ? 'Enabled' : 'Disabled') : 'Failed';
+          showToast(`Bypass charging ${result ? (enabled ? 'enabled' : 'disabled') : 'failed'}`);
+        
         });
       }
 
@@ -368,6 +408,28 @@
           ];
         }
         // Run all commands sequentially
+        for (const cmd of commands) {
+          await exec(cmd);
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    // Set bypass charging state using KernelSU exec
+    async function setBypassCharging(enable) {
+      try {
+        let commands = [];
+        if (enable) {
+          commands = [
+            `echo 1 > /sys/class/qcom-battery/input_suspend`
+          ];
+        } else {
+          commands = [
+            `echo 0 > /sys/class/qcom-battery/input_suspend`
+          ];
+        }
         for (const cmd of commands) {
           await exec(cmd);
         }
