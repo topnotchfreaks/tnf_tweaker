@@ -196,6 +196,8 @@
 
     // --- UI logic ---
     document.addEventListener('DOMContentLoaded', async () => {
+      fetchDeviceInfo(); // Start fetching device info immediately
+
       await loadTweakerConfig();
 
       // Profile icon logic
@@ -322,14 +324,13 @@
 
     // Fetch kernel version and device model using KernelSU exec
     function fetchDeviceInfo() {
-      // Kernel version
+      // Start both fetches at the same time
       exec('uname -r').then(({ stdout }) => {
         document.getElementById('kernel-version').textContent = stdout.trim() || 'Unknown';
       }).catch(() => {
         document.getElementById('kernel-version').textContent = 'Error loading';
       });
 
-      // Device model
       exec('getprop ro.product.vendor.model').then(({ stdout }) => {
         document.getElementById('device-model').textContent = stdout.trim() || 'Unknown';
       }).catch(() => {
@@ -341,7 +342,7 @@
     function fetchModuleVersion() {
       fetch('https://api.github.com/repos/topnotchfreaks/tnf_tweaker/releases/latest')
         .then(res => res.json())
-        .then(data => {
+        .then (data => {
           document.getElementById('module-version').textContent = data.tag_name || 'Unknown';
         })
         .catch(() => {
