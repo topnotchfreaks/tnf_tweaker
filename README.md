@@ -31,4 +31,8 @@ Contributions are welcome! If you have suggestions for improvements or new featu
 - **Email**: belowzeroiq@proton.me
 - **Telegram**: @belowzeroiq
 
+### Credits
+
+- **@Masramms** on Telegram for Disable thermal modules
+
 This README now includes the GPLv3 license information, providing clarity on the licensing terms for users and contributors.
