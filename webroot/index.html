@@ -17,7 +17,7 @@
         <option value="es">ES</option>
         <option value="pt">PT</option>
         <option value="zh">CN</option>
-        <option value="ja">JA</option>
+        <option value="ja">JP</option>
         <option value="kr">KR</option>
         <!-- Add more languages as needed -->
       </select>
@@ -92,6 +92,68 @@
           <div class="w-11 h-6 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:bg-red-500 transition-colors"></div>
           <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transform peer-checked:translate-x-5 transition-transform"></div>
         </label>
+      </div>
+    </div>
+
+    <!-- Game List for Bypass Charging -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm" data-i18n="game_bypass">Auto Bypass for Games</label>
+      <div class="bg-zinc-800 rounded-xl p-4 shadow">
+        <div class="flex justify-between items-center mb-3">
+          <span data-i18n="game_list">Game Package List</span>
+          <div class="flex space-x-2">
+            <button id="add-game" class="bg-gray-500 text-white px-2 py-1 rounded-lg text-sm flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <button id="edit-gamelist" class="bg-red-500 text-white px-4 py-1 rounded-lg text-sm">
+              <span data-i18n="edit">Edit</span>
+            </button>
+          </div>
+        </div>
+        <div class="bg-zinc-700 rounded-lg p-3 h-32 overflow-y-auto text-xs" id="gamelist-preview">
+          Loading game list...
+        </div>
+        <div class="mt-3 text-xs text-gray-400" data-i18n="game_list_help">
+          Bypass charging will auto-enable when these games are detected
+        </div>
+      </div>
+    </div>
+    
+    <!-- Add Game Modal -->
+    <div id="addgame-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-zinc-800 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+        <div class="p-4 border-b border-zinc-700">
+          <h3 class="font-bold" data-i18n="add_game">Add Game Package</h3>
+        </div>
+        <div class="p-4 flex-1">
+          <input type="text" id="game-package-input" class="w-full bg-zinc-700 text-white p-3 rounded-lg" 
+                 placeholder="com.example.game" autocomplete="off">
+          <div class="mt-3 text-xs text-gray-400" data-i18n="package_help">
+            Enter the game's package name (e.g. com.mobile.legends)
+          </div>
+        </div>
+        <div class="p-4 border-t border-zinc-700 flex justify-end space-x-3">
+          <button id="cancel-addgame" class="px-4 py-2 rounded-lg bg-zinc-700" data-i18n="cancel">Cancel</button>
+          <button id="confirm-addgame" class="px-4 py-2 rounded-lg bg-gray-500" data-i18n="add">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game List Editor Modal -->
+    <div id="gamelist-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-zinc-800 rounded-xl w-full max-w-md max-h-[80vh] flex flex-col">
+        <div class="p-4 border-b border-zinc-700">
+          <h3 class="font-bold" data-i18n="edit_game_list">Edit Game List</h3>
+        </div>
+        <div class="p-4 flex-1 overflow-y-auto">
+          <textarea id="gamelist-edit" class="w-full h-64 bg-zinc-700 text-white p-3 rounded-lg text-xs font-mono"></textarea>
+        </div>
+        <div class="p-4 border-t border-zinc-700 flex justify-end space-x-3">
+          <button id="cancel-gamelist" class="px-4 py-2 rounded-lg bg-zinc-700" data-i18n="cancel">Cancel</button>
+          <button id="save-gamelist" class="px-4 py-2 rounded-lg bg-red-500" data-i18n="save">Save</button>
+        </div>
       </div>
     </div>
 
@@ -523,6 +585,16 @@ const translations = {
     author: "Author",
     github_project: "GitHub Project",
     support_group: "Support group",
+    game_bypass: "Auto Bypass for Games",
+    game_list: "Game Package List",
+    edit: "Edit",
+    game_list_help: "Bypass charging will auto-enable when these games are detected",
+    edit_game_list: "Edit Game List",
+    cancel: "Cancel",
+    save: "Save",
+    add_game: "Add Game Package",
+    package_help: "Enter the game's package name (e.g. com.mobile.legends)",
+    add: "Add"
   },
   es: {
     kernel_profiles_mode: "Modo de Perfiles del Kernel",
@@ -535,6 +607,16 @@ const translations = {
     author: "Autor",
     github_project: "Proyecto GitHub",
     support_group: "Grupo de soporte",
+    game_bypass: "Bypass automático para juegos",
+    game_list: "Lista de paquetes de juegos",
+    edit: "Editar",
+    game_list_help: "El bypass de carga se activará automáticamente cuando se detecten estos juegos",
+    edit_game_list: "Editar lista de juegos",
+    cancel: "Cancelar",
+    save: "Guardar",
+    add_game: "Agregar Paquete de Juego",
+    package_help: "Ingrese el nombre del paquete del juego (ej. com.mobile.legends)",
+    add: "Agregar"
   },
   id: {
     kernel_profiles_mode: "Mode Profil Kernel",
@@ -547,6 +629,16 @@ const translations = {
     author: "Penulis",
     github_project: "Proyek GitHub",
     support_group: "Grup dukungan",
+    game_bypass: "Auto Bypass untuk Game",
+    game_list: "Daftar Paket Game",
+    edit: "Edit",
+    game_list_help: "Bypass charging akan aktif otomatis saat game ini terdeteksi",
+    edit_game_list: "Edit Daftar Game",
+    cancel: "Batal",
+    save: "Simpan",
+    add_game: "Tambah Paket Game",
+    package_help: "Masukkan nama paket game (misal: com.mobile.legends)",
+    add: "Tambah"
   },
   ja: {
     kernel_profiles_mode: "カーネルプロファイルモード",
@@ -559,6 +651,16 @@ const translations = {
     author: "作者",
     github_project: "GitHubプロジェクト",
     support_group: "サポートグループ",
+    game_bypass: "ゲーム自動バイパス",
+    game_list: "ゲームパッケージ一覧",
+    edit: "編集",
+    game_list_help: "これらのゲームが検出されたら自動的にバイパス充電を有効化します",
+    edit_game_list: "ゲームリストを編集",
+    cancel: "キャンセル",
+    save: "保存",
+    add_game: "ゲームパッケージを追加",
+    package_help: "ゲームのパッケージ名を入力 (例: com.mobile.legends)",
+    add: "追加"
   },
   pt: {
     kernel_profiles_mode: "Modo de Perfis do Kernel",
@@ -571,6 +673,16 @@ const translations = {
     author: "Autor",
     github_project: "Projeto no GitHub",
     support_group: "Grupo de suporte",
+    game_bypass: "Bypass automático para jogos",
+    game_list: "Lista de pacotes de jogos",
+    edit: "Editar",
+    game_list_help: "O bypass será ativado automaticamente ao detectar esses jogos",
+    edit_game_list: "Editar lista de jogos",
+    cancel: "Cancelar",
+    save: "Salvar",
+    add_game: "Adicionar pacote de jogo",
+    package_help: "Digite o nome do pacote do jogo (ex: com.mobile.legends)",
+    add: "Adicionar"
   },
   zh: {
     kernel_profiles_mode: "内核配置模式",
@@ -583,6 +695,16 @@ const translations = {
     author: "作者",
     github_project: "GitHub 项目",
     support_group: "支持群组",
+    game_bypass: "游戏自动旁路",
+    game_list: "游戏包列表",
+    edit: "编辑",
+    game_list_help: "检测到以下游戏时将自动启用旁路充电",
+    edit_game_list: "编辑游戏列表",
+    cancel: "取消",
+    save: "保存",
+    add_game: "添加游戏包",
+    package_help: "输入游戏的包名 (例如: com.mobile.legends)",
+    add: "添加"
   },
   kr: {
     kernel_profiles_mode: "커널 프로필 모드",
@@ -595,8 +717,17 @@ const translations = {
     author: "작성자",
     github_project: "GitHub 프로젝트",
     support_group: "지원 그룹",
+    game_bypass: "게임 자동 바이패스",
+    game_list: "게임 패키지 목록",
+    edit: "편집",
+    game_list_help: "다음 게임이 감지되면 자동으로 바이패스 충전이 활성화됩니다",
+    edit_game_list: "게임 목록 편집",
+    cancel: "취소",
+    save: "저장",
+    add_game: "게임 패키지 추가",
+    package_help: "게임의 패키지 이름 입력 (예: com.mobile.legends)",
+    add: "추가"
   }
-  // Add more languages here
 };
 
 function updateLanguage(lang) {
@@ -608,7 +739,7 @@ function updateLanguage(lang) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const langSelect = document.getElementById('lang-select');
   langSelect.addEventListener('change', (e) => {
     updateLanguage(e.target.value);
@@ -620,6 +751,123 @@ document.addEventListener('DOMContentLoaded', () => {
   langSelect.value = savedLang;
   updateLanguage(savedLang);
 });
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Add Game Button
+    document.getElementById('add-game').addEventListener('click', showAddGameModal);
+
+    // Edit Game List Button
+    document.getElementById('edit-gamelist').addEventListener('click', () => {
+        document.getElementById('gamelist-modal').classList.remove('hidden');
+    });
+
+    // Cancel Add Game Button
+    document.getElementById('cancel-addgame').addEventListener('click', () => {
+        document.getElementById('addgame-modal').classList.add('hidden');
+    });
+
+    // Cancel Edit Game List Button
+    document.getElementById('cancel-gamelist').addEventListener('click', () => {
+        document.getElementById('gamelist-modal').classList.add('hidden');
+    });
+
+    // Confirm Add Game Button
+    document.getElementById('confirm-addgame').addEventListener('click', addGamePackage);
+
+    // Save Game List Button
+    document.getElementById('save-gamelist').addEventListener('click', saveGameList);
+
+    await loadGameList(); // Load the game list on page load
+});
+
+// Function to show Add Game Modal
+function showAddGameModal() {
+    document.getElementById('addgame-modal').classList.remove('hidden');
+    document.getElementById('game-package-input').focus(); // Focus on the input field
+}
+
+// Function to add a game package
+async function addGamePackage() {
+    const packageName = document.getElementById('game-package-input').value.trim();
+
+    if (!packageName) {
+        showToast('Please enter a package name');
+        return;
+    }
+
+    try {
+        // Check if package already exists
+        const { stdout } = await exec('cat /data/adb/tnftweaker/gamelist.txt || echo ""');
+        const games = stdout.trim().split('\n').filter(Boolean);
+
+        if (games.includes(packageName)) {
+            showToast('This game is already in the list');
+            return;
+        }
+
+        // Add the new package
+        await exec(`echo "${packageName}" >> /data/adb/tnftweaker/gamelist.txt`);
+        document.getElementById('game-package-input').value = ''; // Clear input
+        document.getElementById('addgame-modal').classList.add('hidden'); // Hide modal
+        loadGameList(); // Reload the game list
+        showToast('Game added successfully');
+    } catch (err) {
+        console.error("Failed to add game:", err);
+        showToast('Failed to add game');
+    }
+}
+
+// Function to save the game list
+async function saveGameList() {
+    const content = document.getElementById('gamelist-edit').value.trim();
+    try {
+        await exec(`echo "${content}" > /data/adb/tnftweaker/gamelist.txt`);
+        loadGameList(); // Reload the game list
+        showToast('Game list saved');
+        document.getElementById('gamelist-modal').classList.add('hidden'); // Hide modal
+    } catch (err) {
+        console.error("Failed to save game list:", err);
+        showToast('Failed to save game list');
+    }
+}
+
+// Function to show toast notifications
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    toast.classList.add('opacity-100');
+    clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+    }, 2000);
+}
+
+// Function to load the game list
+async function loadGameList() {
+    try {
+        // Read the game list from the file
+        const { stdout } = await exec('cat /data/adb/tnftweaker/gamelist.txt || echo ""');
+        const games = stdout.trim().split('\n').filter(Boolean); // Split by new lines and filter out empty lines
+
+        // Update the game list preview area
+        const gamelistPreview = document.getElementById('gamelist-preview');
+        if (games.length > 0) {
+            gamelistPreview.textContent = games.join('\n'); // Join games with new lines for display
+        } else {
+            gamelistPreview.textContent = 'No games in list'; // Display message if no games
+        }
+
+        // Update the textarea in the edit modal
+        const gamelistEdit = document.getElementById('gamelist-edit');
+        gamelistEdit.value = games.join('\n'); // Set the textarea value to the game list
+    } catch (err) {
+        console.error("Failed to load game list:", err);
+        showToast('Failed to load game list');
+    }
+}
+
   </script>
 </body>
 </html>

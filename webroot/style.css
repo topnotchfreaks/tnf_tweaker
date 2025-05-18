@@ -18,3 +18,16 @@ input[type="checkbox"]:hover {
 button:hover {
   filter: brightness(1.1);
 }
+#gamelist-modal {
+  transition: opacity 0.2s ease;
+}
+
+#gamelist-edit {
+  resize: none;
+  outline: none;
+}
+
+#gamelist-preview {
+  white-space: pre-wrap;
+  font-family: monospace;
+}

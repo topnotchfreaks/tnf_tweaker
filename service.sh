@@ -65,3 +65,61 @@ elif [ "$thermal" = "disabled" ]; then
   setprop init.svc.vendor.thermal-hal-2-0.mtk stopped
   setprop init.svc.vendor.thermal-hal-2-0 stopped
 fi
+
+# Game detection for bypass charging
+GAMELIST="/data/adb/tnftweaker/gamelist.txt"
+CURRENT_APP=""
+
+# Create default gamelist if doesn't exist
+[ -f "$GAMELIST" ] || {
+  cat <<EOF > "$GAMELIST"
+com.tencent.ig
+com.pubg.krmobile
+com.vng.pubgmobile
+com.rekoo.pubgm
+com.activision.callofduty.shooter
+com.dts.freefireth
+com.dts.freefiremax
+com.ea.gp.apexlegendsmobilefps
+com.mobile.legends
+com.ngame.allstar.eu
+com.garena.game.kgvn
+jp.pokemon.pokemonunite
+com.riotgames.league.wildrift
+com.gameloft.android.ANMP.GloftA9HM
+com.ea.games.r3_row
+com.ea.gp.fifamobile
+jp.konami.pesam
+com.mojang.minecraftpe
+com.roblox.client
+com.and.games505.TerrariaPaid
+com.king.candycrushsaga
+com.supercell.clashofclans
+com.supercell.clashroyale
+com.supercell.brawlstars
+EOF
+}
+
+while true; do
+  # Get current foreground app
+  NEW_APP=$(dumpsys window windows | grep -E 'mCurrentFocus|mFocusedApp' | grep -oE '\b[^ ]+/[^ ]+\b' | cut -d/ -f1)
+  
+  # Only proceed if app changed
+  if [ "$NEW_APP" != "$CURRENT_APP" ]; then
+    CURRENT_APP="$NEW_APP"
+    
+    # Check if current app is in gamelist
+    if grep -q "^$CURRENT_APP$" "$GAMELIST"; then
+      echo "Game detected: $CURRENT_APP - enabling bypass charging"
+      echo 1 > /sys/class/qcom-battery/input_suspend
+    else
+      # Only disable if bypasscharging wasn't manually enabled
+      if [ "$bypasscharging" != "enabled" ]; then
+        echo "Non-game app: $CURRENT_APP - disabling bypass charging"
+        echo 0 > /sys/class/qcom-battery/input_suspend
+      fi
+    fi
+  fi
+  
+  sleep 2
+done
