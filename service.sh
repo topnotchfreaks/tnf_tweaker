@@ -53,6 +53,11 @@ com.king.candycrushsaga
 com.supercell.clashofclans
 com.supercell.clashroyale
 com.supercell.brawlstars
+com.miHoYo.GenshinImpact
+com.miHoYo.HonkaiImpact3rd
+com.HoYoverse.hkrpgoversea
+com.miHoYo.hkrpg
+com.cognosphere.zenless
 EOF
 }
 
