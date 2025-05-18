@@ -27,7 +27,7 @@ Contributions are welcome! If you have suggestions for improvements or new featu
 
 ### Contacts
 
-- **Repository URL**: `https://github.com/topnotchfreaks/tnf-tweaker.git`
+- **Repository URL**: `https://github.com/topnotchfreaks/tnf_tweaker.git`
 - **Email**: belowzeroiq@proton.me
 - **Telegram**: @belowzeroiq
 
