@@ -11,31 +11,41 @@
     <!-- Header -->
     <div class="flex justify-between items-center px-6 pt-6">
       <h1 class="text-xl font-bold tracking-tight">TNF Tweaker</h1>
+      <select id="lang-select" class="bg-zinc-800 text-white rounded px-2 py-1 ml-4">
+        <option value="en">EN</option>
+        <option value="id">ID</option>
+        <option value="es">ES</option>
+        <option value="pt">PT</option>
+        <option value="zh">CN</option>
+        <option value="ja">JA</option>
+        <option value="kr">KR</option>
+        <!-- Add more languages as needed -->
+      </select>
     </div>
 
     <!-- System Info Card -->
     <div class="bg-zinc-800 rounded-xl p-4 mx-6 mt-4 space-y-3 text-sm shadow-inner">
       <div class="flex items-center space-x-2">
         <img src="assets/cpu.svg" alt="Kernel" class="w-5 h-5" />
-        <p>Kernel version<br><span id="kernel-version" class="text-gray-400">Loading...</span></p>
+        <p><span data-i18n="kernel_version">Kernel version</span><br><span id="kernel-version" class="text-gray-400">Loading...</span></p>
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/phone.svg" alt="Device" class="w-5 h-5" />
-        <p>Device model<br><span id="device-model" class="text-gray-400">Loading...</span></p>
+        <p><span data-i18n="device_model">Device model</span><br><span id="device-model" class="text-gray-400">Loading...</span></p>
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/settings.svg" alt="Module" class="w-5 h-5" />
-        <p>Module version<br><span id="module-version" class="text-gray-400">Loading...</span></p>
+        <p><span data-i18n="module_version">Module version</span><br><span id="module-version" class="text-gray-400">Loading...</span></p>
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/profile.svg" alt="Status" class="w-5 h-5"/>
-        <p>Author<br><span id="module-status" class="text-gray-400">belowzeroiq</span></p>
+        <p><span data-i18n="author">Author</span><br><span id="module-status" class="text-gray-400">belowzeroiq</span></p>
       </div>
     </div>
 
     <!-- Kernel Profiles -->
     <div class="px-6 mt-6">
-      <label class="block mb-2 font-semibold text-sm">Kernel Profiles Mode</label>
+      <label class="block mb-2 font-semibold text-sm" data-i18n="kernel_profiles_mode">Kernel Profiles Mode</label>
       <div class="flex items-center">
         <div id="profile-icon-container" class="relative flex items-center space-x-2 bg-zinc-800 px-4 py-2 rounded-xl shadow flex-1">
           <img id="profile-icon" src="assets/settings.svg" alt="Profile" class="w-5 h-5 min-w-5 min-h-5 max-w-5 max-h-5 transition-all duration-200 object-contain" />
@@ -53,7 +63,7 @@
 
     <!-- Thermal Mode -->
     <div class="px-6 mt-6">
-      <label class="block mb-2 font-semibold text-sm">Thermal Throttling</label>
+      <label class="block mb-2 font-semibold text-sm" data-i18n="thermal_throttling">Thermal Throttling</label>
       <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
         <div class="flex items-center space-x-2">
           <img src="assets/heat.svg" alt="Thermal" class="w-5 h-5" />
@@ -70,7 +80,7 @@
 
     <!-- Bypass Charging -->
     <div class="px-6 mt-6">
-      <label class="block mb-2 font-semibold text-sm">Bypass Charging</label>
+      <label class="block mb-2 font-semibold text-sm" data-i18n="bypass_charging">Bypass Charging</label>
       <div class="flex justify-between items-center bg-zinc-800 px-4 py-3 rounded-xl shadow">
         <div class="flex items-center space-x-2">
           <img src="assets/charging.svg" alt="Bypass" class="w-5 h-5" />
@@ -87,11 +97,17 @@
 
     <!-- About Modules -->
     <div class="px-6 mt-6 mb-8">
-      <label class="block mb-2 font-semibold text-sm">About Modules</label>
+      <label class="block mb-2 font-semibold text-sm" data-i18n="about_modules">About Modules</label>
       <div class="bg-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between shadow">
         <div class="text-sm">
-          <p>GitHub Project<br><span class="text-gray-400">TNF Tweaker</span></p>
-          <p>Support group<br><span class="text-gray-400">t.me/topnotchfreaks_chat</span></p>
+          <p>
+            <span data-i18n="github_project">GitHub Project</span><br>
+            <span class="text-gray-400">TNF Tweaker</span>
+          </p>
+          <p>
+            <span data-i18n="support_group">Support group</span><br>
+            <span class="text-gray-400">t.me/topnotchfreaks_chat</span>
+          </p>
         </div>
         <div class="flex flex-col space-y-3 items-end ml-4">
           <a href="https://github.com/topnotchfreaks/tnf_tweaker" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors" title="GitHub">
@@ -493,6 +509,117 @@
     }
 
     loadTweakerConfig();
+  </script>
+  <script>
+const translations = {
+  en: {
+    kernel_profiles_mode: "Kernel Profiles Mode",
+    thermal_throttling: "Thermal Throttling",
+    bypass_charging: "Bypass Charging",
+    about_modules: "About Modules",
+    kernel_version: "Kernel version",
+    device_model: "Device model",
+    module_version: "Module version",
+    author: "Author",
+    github_project: "GitHub Project",
+    support_group: "Support group",
+  },
+  es: {
+    kernel_profiles_mode: "Modo de Perfiles del Kernel",
+    thermal_throttling: "Limitación Térmica",
+    bypass_charging: "Omitir Carga",
+    about_modules: "Acerca de los Módulos",
+    kernel_version: "Versión del kernel",
+    device_model: "Modelo del dispositivo",
+    module_version: "Versión del módulo",
+    author: "Autor",
+    github_project: "Proyecto GitHub",
+    support_group: "Grupo de soporte",
+  },
+  id: {
+    kernel_profiles_mode: "Mode Profil Kernel",
+    thermal_throttling: "Pembatasan Termal",
+    bypass_charging: "Lewati Pengisian",
+    about_modules: "Tentang Modul",
+    kernel_version: "Versi kernel",
+    device_model: "Model perangkat",
+    module_version: "Versi modul",
+    author: "Penulis",
+    github_project: "Proyek GitHub",
+    support_group: "Grup dukungan",
+  },
+  ja: {
+    kernel_profiles_mode: "カーネルプロファイルモード",
+    thermal_throttling: "サーマルスロットリング",
+    bypass_charging: "バイパス充電",
+    about_modules: "モジュールについて",
+    kernel_version: "カーネルバージョン",
+    device_model: "デバイスモデル",
+    module_version: "モジュールバージョン",
+    author: "作者",
+    github_project: "GitHubプロジェクト",
+    support_group: "サポートグループ",
+  },
+  pt: {
+    kernel_profiles_mode: "Modo de Perfis do Kernel",
+    thermal_throttling: "Limitação Térmica",
+    bypass_charging: "Ignorar Carregamento",
+    about_modules: "Sobre os Módulos",
+    kernel_version: "Versão do kernel",
+    device_model: "Modelo do dispositivo",
+    module_version: "Versão do módulo",
+    author: "Autor",
+    github_project: "Projeto no GitHub",
+    support_group: "Grupo de suporte",
+  },
+  zh: {
+    kernel_profiles_mode: "内核配置模式",
+    thermal_throttling: "温控降频",
+    bypass_charging: "旁路充电",
+    about_modules: "关于模块",
+    kernel_version: "内核版本",
+    device_model: "设备型号",
+    module_version: "模块版本",
+    author: "作者",
+    github_project: "GitHub 项目",
+    support_group: "支持群组",
+  },
+  kr: {
+    kernel_profiles_mode: "커널 프로필 모드",
+    thermal_throttling: "열 스로틀링",
+    bypass_charging: "바이패스 충전",
+    about_modules: "모듈 정보",
+    kernel_version: "커널 버전",
+    device_model: "디바이스 모델",
+    module_version: "모듈 버전",
+    author: "작성자",
+    github_project: "GitHub 프로젝트",
+    support_group: "지원 그룹",
+  }
+  // Add more languages here
+};
+
+function updateLanguage(lang) {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (translations[lang] && translations[lang][key]) {
+      el.textContent = translations[lang][key];
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const langSelect = document.getElementById('lang-select');
+  langSelect.addEventListener('change', (e) => {
+    updateLanguage(e.target.value);
+    localStorage.setItem('tnf_lang', e.target.value);
+  });
+
+  // Set initial language
+  const savedLang = localStorage.getItem('tnf_lang') || 'en';
+  langSelect.value = savedLang;
+  updateLanguage(savedLang);
+});
   </script>
 </body>
 </html>
