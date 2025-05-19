@@ -5,9 +5,9 @@ CONF="/data/adb/tnftweaker/tweaker_config.conf"
 
 # If config doesn't exist, create with default empty keys
 [ -f "$CONF" ] || cat <<EOF > "$CONF"
-profile=
-thermal=
-governor=
+profile=balanced
+thermal=enabled
+governor=walt
 EOF
 
 # Function to safely update a config key
@@ -32,13 +32,6 @@ case "$profile" in
   balanced)    echo 2 > /sys/kernel/kprofiles/kp_mode ;;
   performance) echo 3 > /sys/kernel/kprofiles/kp_mode ;;
 esac
-
-# Apply saved governor to all CPU policies
-if [ -n "$governor" ]; then
-  for policy in /sys/devices/system/cpu/cpufreq/policy*; do
-    echo "$governor" > "$policy/scaling_governor"
-  done
-fi
 
 # Apply thermal setting if set
 if [ "$thermal" = "enabled" ]; then
