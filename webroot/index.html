@@ -61,6 +61,22 @@
       </div>
     </div>
 
+    <!-- CPU Governor Selector -->
+    <div class="px-6 mt-6">
+      <label class="block mb-2 font-semibold text-sm" data-i18n="cpu_governor">CPU Governor</label>
+      <div class="flex items-center">
+        <div id="governor-icon-container" class="relative flex items-center space-x-2 bg-zinc-800 px-4 py-2 rounded-xl shadow flex-1">
+          <img id="governor-icon" src="assets/settings.svg" alt="Governor" class="w-5 h-5 object-contain" />
+          <select id="governor-select" class="bg-transparent focus:outline-none text-white pr-8 w-full">
+            <option value="">Loading...</option>
+          </select>
+        </div>
+        <button id="apply-governor" class="ml-4 bg-red-500 text-white px-6 py-2 rounded-xl font-semibold shadow hover:scale-105 transition-transform whitespace-nowrap">
+          Apply
+        </button>
+      </div>
+    </div>
+
     <!-- Thermal Mode -->
     <div class="px-6 mt-6">
       <label class="block mb-2 font-semibold text-sm" data-i18n="thermal_throttling">Thermal Throttling</label>
@@ -531,6 +547,7 @@ async function setThermalThrottling(enable) {
 const translations = {
   en: {
     kernel_profiles_mode: "Kernel Profiles Mode",
+    cpu_governor: "CPU Governor",
     thermal_throttling: "Thermal Throttling",
     bypass_charging: "Bypass Charging",
     about_modules: "About Modules",
@@ -553,6 +570,7 @@ const translations = {
   },
   es: {
     kernel_profiles_mode: "Modo de Perfiles del Kernel",
+    cpu_governor: "Gobernador de CPU",
     thermal_throttling: "Limitación Térmica",
     bypass_charging: "Omitir Carga",
     about_modules: "Acerca de los Módulos",
@@ -575,6 +593,7 @@ const translations = {
   },
   id: {
     kernel_profiles_mode: "Mode Profil Kernel",
+    cpu_governor: "Governor CPU",
     thermal_throttling: "Pembatasan Termal",
     bypass_charging: "Lewati Pengisian",
     about_modules: "Tentang Modul",
@@ -597,6 +616,7 @@ const translations = {
   },
   ja: {
     kernel_profiles_mode: "カーネルプロファイルモード",
+    cpu_governor: "CPUガバナー",
     thermal_throttling: "サーマルスロットリング",
     bypass_charging: "バイパス充電",
     about_modules: "モジュールについて",
@@ -619,6 +639,7 @@ const translations = {
   },
   pt: {
     kernel_profiles_mode: "Modo de Perfis do Kernel",
+    cpu_governor: "Governador da CPU",
     thermal_throttling: "Limitação Térmica",
     bypass_charging: "Ignorar Carregamento",
     about_modules: "Sobre os Módulos",
@@ -641,6 +662,7 @@ const translations = {
   },
   zh: {
     kernel_profiles_mode: "内核配置模式",
+    cpu_governor: "CPU 调速器",
     thermal_throttling: "温控降频",
     bypass_charging: "旁路充电",
     about_modules: "关于模块",
@@ -663,6 +685,7 @@ const translations = {
   },
   kr: {
     kernel_profiles_mode: "커널 프로필 모드",
+    cpu_governor: "CPU 거버너",
     thermal_throttling: "열 스로틀링",
     bypass_charging: "바이패스 충전",
     about_modules: "모듈 정보",
@@ -705,6 +728,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   const savedLang = localStorage.getItem('tnf_lang') || 'en';
   langSelect.value = savedLang;
   updateLanguage(savedLang);
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadAvailableGovernors(); // Load governors on page load
+});
+
+// Load available governors
+async function loadAvailableGovernors() {
+  try {
+    const { stdout } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors");
+    const governors = stdout.trim().split(/\s+/);
+    const select = document.getElementById("governor-select");
+
+    select.innerHTML = ""; // Clear options
+    governors.forEach(gov => {
+      const option = document.createElement("option");
+      option.value = gov;
+      option.textContent = gov.charAt(0).toUpperCase() + gov.slice(1);
+      select.appendChild(option);
+    });
+
+    // Set current governor
+    const { stdout: current } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor");
+    select.value = current.trim();
+  } catch (err) {
+    console.error("Governor loading error:", err);
+    showToast("Failed to load governors");
+  }
+}
+
+// Apply governor on button click
+document.getElementById("apply-governor").addEventListener("click", async () => {
+  const selectedGovernor = document.getElementById("governor-select").value;
+  if (!selectedGovernor) return showToast("Select a governor first");
+
+  try {
+    const { stdout } = await exec("ls /sys/devices/system/cpu/cpufreq | grep policy");
+    const policies = stdout.trim().split("\n");
+
+    for (const policy of policies) {
+      await exec(`echo ${selectedGovernor} > /sys/devices/system/cpu/cpufreq/${policy}/scaling_governor`);
+    }
+
+    showToast(`Governor set to ${selectedGovernor}`);
+    await updateTweakerConfig("governor", selectedGovernor);
+  } catch (err) {
+    console.error("Governor apply error:", err);
+    showToast("Failed to apply governor");
+  }
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
