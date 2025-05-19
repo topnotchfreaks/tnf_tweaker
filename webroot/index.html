@@ -51,7 +51,7 @@
       </div>
       <div class="flex items-center space-x-2">
         <img src="assets/settings.svg" alt="Module" class="w-5 h-5" />
-        <p><span data-i18n="module_version">Module version</span><br><span id="module-version" class="text-gray-400">Loading...</span></p>
+        <p><span data-i18n="module_version">Module version</span><br><span id="module-version" class="text-gray-400">0.5-BETA</span></p>
       </div>
     </div>
 
@@ -385,16 +385,6 @@
         });
       });
 
-      // Refresh button notification
-      const refreshBtn = document.getElementById('refresh-btn');
-      if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-          showToast('Refreshed!');
-          fetchDeviceInfo();
-          fetchModuleVersion();
-        });
-      }
-
     // Load current profile on page load
     document.addEventListener("DOMContentLoaded", () => {
       profileSelect.addEventListener("change", async () => {
@@ -439,7 +429,6 @@
 
       // Initial fetches
       fetchDeviceInfo();
-      fetchModuleVersion();
     });
 
     // Toast notification function
@@ -469,18 +458,6 @@
       }).catch(() => {
         document.getElementById('device-model').textContent = 'Error loading';
       });
-    }
-
-    // Fetch module version from GitHub releases (still uses fetch, not exec)
-    function fetchModuleVersion() {
-      fetch('https://api.github.com/repos/topnotchfreaks/tnf_tweaker/releases/latest')
-        .then(res => res.json())
-        .then (data => {
-          document.getElementById('module-version').textContent = data.tag_name || 'Unknown';
-        })
-        .catch(() => {
-          document.getElementById('module-version').textContent = 'Unavailable';
-        });
     }
 
 // Function to the thermal throttling
