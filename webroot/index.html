@@ -334,7 +334,7 @@
             .then(() => {
               showToast(`Applied profile: ${selectedText}`);
               // Save the selected profile persistently for boot
-              exec(`echo "profile=${profileSelect.value}" > /data/adb/tnftweaker/tweaker_config.conf`);
+              exec(`sed -i 's/^profile=.*/profile=${profileSelect.value}/' /data/adb/tnftweaker/tweaker_config.conf`);
             })
             .catch(() => showToast('Failed to apply profile'));
         });
