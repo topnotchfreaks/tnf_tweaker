@@ -13,6 +13,13 @@ case "$profile" in
   performance) echo 3 > /sys/kernel/kprofiles/kp_mode ;;
 esac
 
+# Apply saved governor to all CPU policies
+if [ -n "$governor" ]; then
+  for policy in /sys/devices/system/cpu/cpufreq/policy*; do
+    echo "$governor" > "$policy/scaling_governor"
+  done
+fi
+
 # Apply thermal setting if set
 if [ "$thermal" = "enabled" ]; then
   # Enable thermal throttling (your enable commands)
