@@ -763,23 +763,23 @@ async function updateDeviceStats() {
     // 1. CPU Big Frequency (assumed from policy4 – adjust if necessary)
     const { stdout: cpuBigRaw } = await exec("cat /sys/devices/system/cpu/cpufreq/policy4/scaling_cur_freq");
     const cpuBigMHz = Math.round(parseInt(cpuBigRaw.trim()) / 1000);
-    document.getElementById('cpu-big-clock').textContent = `${cpuBigMHz} MHz`;
+    document.getElementById('cpu-big-clock').textContent = `${cpuBigMHz}MHz`;
 
     // 2. CPU Little Frequency (assumed from policy4 – adjust if necessary)
     const { stdout: cpuFreqRaw } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq");
     const cpuMHz = Math.round(parseInt(cpuFreqRaw.trim()) / 1000);
-    document.getElementById('cpu-little-clock').textContent = `${cpuMHz} MHz`;
+    document.getElementById('cpu-little-clock').textContent = `${cpuMHz}MHz`;
 
     // Battery Temperature (°C)
     const { stdout: battTempRaw } = await exec("cat /sys/class/power_supply/battery/temp");
     const battTempC = (parseInt(battTempRaw.trim()) / 10).toFixed(1);
-    document.getElementById('battery-temp').textContent = `${battTempC} °C`;
+    document.getElementById('battery-temp').textContent = `${battTempC}°C`;
 
     // RAM Utilization (%)
     const { stdout: memInfoRaw } = await exec("cat /proc/meminfo");
     const memInfo = parseMemInfo(memInfoRaw);
     const ramUsedPercent = Math.round(((memInfo.MemTotal - memInfo.MemAvailable) / memInfo.MemTotal) * 100);
-    document.getElementById('ram-util').textContent = `${ramUsedPercent} %`;
+    document.getElementById('ram-util').textContent = `${ramUsedPercent}%`;
 
   } catch (err) {
     console.error('Error updating device stats:', err);
