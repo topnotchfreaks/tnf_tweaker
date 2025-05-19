@@ -39,6 +39,26 @@
       </div>
     </div>
 
+    <!-- Simple Stats Cards -->
+    <div class="flex justify-around mx-6 mt-2 space-x-3 text-xs text-gray-300">
+      <div class="bg-zinc-800 rounded-md p-2 flex flex-col items-center w-20 shadow">
+        <p class="text-gray-400">CPU</p>
+        <span id="cpu-big-clock" class="font-mono">--MHz</span>
+      </div>
+      <div class="bg-zinc-800 rounded-md p-2 flex flex-col items-center w-20 shadow">
+        <p class="text-gray-400">CPU</p>
+        <span id="cpu-little-clock" class="font-mono">--MHz</span>
+      </div>
+      <div class="bg-zinc-800 rounded-md p-2 flex flex-col items-center w-20 shadow">
+        <p class="text-gray-400">Battery</p>
+        <span id="battery-temp" class="font-mono">--°C</span>
+      </div>
+      <div class="bg-zinc-800 rounded-md p-2 flex flex-col items-center w-20 shadow">
+        <p class="text-gray-400">RAM</p>
+        <span id="ram-util" class="font-mono">--%</span>
+      </div>
+    </div>
+
     <!-- Kernel Profiles -->
     <div class="px-6 mt-6">
       <label class="block mb-2 font-semibold text-sm" data-i18n="kernel_profiles_mode">Kernel Profiles Mode</label>
@@ -732,6 +752,49 @@ document.addEventListener('DOMContentLoaded', async () => {
   langSelect.value = savedLang;
   updateLanguage(savedLang);
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateDeviceStats();
+  setInterval(updateDeviceStats, 3000); // Refresh every 3 seconds
+});
+
+async function updateDeviceStats() {
+  try {
+    // 1. CPU Big Frequency (assumed from policy4 – adjust if necessary)
+    const { stdout: cpuBigRaw } = await exec("cat /sys/devices/system/cpu/cpufreq/policy4/scaling_cur_freq");
+    const cpuBigMHz = Math.round(parseInt(cpuBigRaw.trim()) / 1000);
+    document.getElementById('cpu-big-clock').textContent = `${cpuBigMHz} MHz`;
+
+    // 2. CPU Little Frequency (assumed from policy4 – adjust if necessary)
+    const { stdout: cpuFreqRaw } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq");
+    const cpuMHz = Math.round(parseInt(cpuFreqRaw.trim()) / 1000);
+    document.getElementById('cpu-little-clock').textContent = `${cpuMHz} MHz`;
+
+    // Battery Temperature (°C)
+    const { stdout: battTempRaw } = await exec("cat /sys/class/power_supply/battery/temp");
+    const battTempC = (parseInt(battTempRaw.trim()) / 10).toFixed(1);
+    document.getElementById('battery-temp').textContent = `${battTempC} °C`;
+
+    // RAM Utilization (%)
+    const { stdout: memInfoRaw } = await exec("cat /proc/meminfo");
+    const memInfo = parseMemInfo(memInfoRaw);
+    const ramUsedPercent = Math.round(((memInfo.MemTotal - memInfo.MemAvailable) / memInfo.MemTotal) * 100);
+    document.getElementById('ram-util').textContent = `${ramUsedPercent} %`;
+
+  } catch (err) {
+    console.error('Error updating device stats:', err);
+  }
+}
+
+// Parse /proc/meminfo into object { MemTotal: bytes, MemAvailable: bytes, ... }
+function parseMemInfo(raw) {
+  return raw.split('\n').reduce((acc, line) => {
+    const [key, val] = line.split(':');
+    if (!key || !val) return acc;
+    acc[key.trim()] = parseInt(val.trim().split(' ')[0]) * 1024; // from kB to bytes
+    return acc;
+  }, {});
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadAvailableGovernors(); // Load governors on page load
