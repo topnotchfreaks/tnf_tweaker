@@ -3,6 +3,26 @@
 mkdir -p /data/adb/tnftweaker
 CONF="/data/adb/tnftweaker/tweaker_config.conf"
 
+# If config doesn't exist, create with default empty keys
+[ -f "$CONF" ] || cat <<EOF > "$CONF"
+profile=
+thermal=
+governor=
+EOF
+
+# Function to safely update a config key
+set_config_value() {
+    local key="$1"
+    local value="$2"
+
+    # If key exists, replace its value; otherwise, append it
+    if grep -q "^${key}=" "$CONF"; then
+        sed -i "s|^${key}=.*|${key}=${value}|" "$CONF"
+    else
+        echo "${key}=${value}" >> "$CONF"
+    fi
+}
+
 # Load config if exists
 [ -f "$CONF" ] && . "$CONF"
 
