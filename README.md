@@ -6,6 +6,8 @@
 
 - **Kernel Profiles**: Seamlessly switch between customizable kernel profiles to achieve the perfect balance of performance and battery efficiency. Whether you're gaming, streaming, or multitasking, TNF Tweaker allows you to optimize your device's performance according to your specific needs.
 
+- **CPU Governor Control**: Take full control over how your CPU manages power and performance. With CPU Governor settings, you can choose from available scaling governors like performance, powersave, or interactive to match your usage scenario — whether it's maximizing battery life or unlocking peak performance.
+
 - **Thermal Throttling Mode**: Safeguard your device from overheating with the Thermal Throttling Mode. Set temperature thresholds for CPU and GPU performance to ensure stable operation during demanding tasks, keeping your device cool and responsive.
 
 - **Bypass Charging**: Enhance your charging experience with the Bypass Charging feature. This allows your device to charge directly while bypassing the battery, reducing heat generation and prolonging battery lifespan. Ideal for intensive gaming sessions or heavy usage scenarios, this feature ensures your device stays powered without compromising performance.
@@ -14,6 +16,9 @@
 
 1. **Download from release page**
 2. **Install through KernelSU modules**
+
+## Notes:
+This module receives frequent updates (BETA), and some changes may require removing previous configurations to apply correctly.
 
 ## Contributing
 
