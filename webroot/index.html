@@ -796,11 +796,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Load available governors
 async function loadAvailableGovernors() {
   try {
-    const { stdout } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_available_governors");
+    const { stdout } = await exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors");
     const governors = stdout.trim().split(/\s+/);
     const select = document.getElementById("governor-select");
 
-    select.innerHTML = ""; // Clear options
+    select.innerHTML = ""; // Clear existing options
     governors.forEach(gov => {
       const option = document.createElement("option");
       option.value = gov;
@@ -808,8 +808,8 @@ async function loadAvailableGovernors() {
       select.appendChild(option);
     });
 
-    // Set current governor
-    const { stdout: current } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor");
+    // Set current governor (read from cpu0 as representative)
+    const { stdout: current } = await exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
     select.value = current.trim();
   } catch (err) {
     console.error("Governor loading error:", err);
@@ -823,11 +823,13 @@ document.getElementById("apply-governor").addEventListener("click", async () => 
   if (!selectedGovernor) return showToast("Select a governor first");
 
   try {
-    const { stdout } = await exec("ls /sys/devices/system/cpu/cpufreq | grep policy");
-    const policies = stdout.trim().split("\n");
+    const { stdout } = await exec("ls -d /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor");
+    const cpuGovernorPaths = stdout.trim().split("\n");
 
-    for (const policy of policies) {
-      await exec(`echo ${selectedGovernor} > /sys/devices/system/cpu/cpufreq/${policy}/scaling_governor`);
+    for (const path of cpuGovernorPaths) {
+      await exec(`chmod 644 ${path}`); // Make it writable
+      await exec(`echo ${selectedGovernor} > ${path}`); // Apply governor
+      await exec(`chmod 444 ${path}`); // Lock it again
     }
 
     showToast(`Governor set to ${selectedGovernor}`);
