@@ -66,11 +66,11 @@
         let profile = "balanced";
         let thermal = "enabled";
         let bypasscharging = "disabled";
-        lines.forEach(line => {
+        for (const line of lines) {
           if (line.startsWith("profile=")) profile = line.split("=")[1];
-          if (line.startsWith("thermal=")) thermal = line.split("=")[1];
-          if (line.startsWith("bypasscharging=")) bypasscharging = line.split("=")[1];
-        });
+          else if (line.startsWith("thermal=")) thermal = line.split("=")[1];
+          else if (line.startsWith("bypasscharging=")) bypasscharging = line.split("=")[1];
+        }
         setProfileUI(profile);
         setThermalUI(thermal === "enabled");
         setBypassChargingUI(bypasscharging === "enabled");
@@ -160,32 +160,40 @@
 
     // --- Device Info & Stats ---
     function fetchDeviceInfo() {
-      exec('uname -r').then(({ stdout }) => {
-        document.getElementById('kernel-version').textContent = stdout.trim() || 'Unknown';
+      // Run both commands in parallel for speed
+      Promise.all([
+        exec('uname -r'),
+        exec('getprop ro.product.vendor.model')
+      ]).then(([kernel, model]) => {
+        document.getElementById('kernel-version').textContent = kernel.stdout.trim() || 'Unknown';
+        document.getElementById('device-model').textContent = model.stdout.trim() || 'Unknown';
       }).catch(() => {
         document.getElementById('kernel-version').textContent = 'Error loading';
-      });
-
-      exec('getprop ro.product.vendor.model').then(({ stdout }) => {
-        document.getElementById('device-model').textContent = stdout.trim() || 'Unknown';
-      }).catch(() => {
         document.getElementById('device-model').textContent = 'Error loading';
       });
     }
 
     async function updateDeviceStats() {
+      // Run all stat fetches in parallel for faster UI update
       try {
-        const { stdout: cpuBigRaw } = await exec("cat /sys/devices/system/cpu/cpufreq/policy4/scaling_cur_freq");
-        document.getElementById('cpu-big-clock').textContent = `${Math.round(parseInt(cpuBigRaw.trim()) / 1000)}MHz`;
-
-        const { stdout: cpuFreqRaw } = await exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq");
-        document.getElementById('cpu-little-clock').textContent = `${Math.round(parseInt(cpuFreqRaw.trim()) / 1000)}MHz`;
-
-        const { stdout: battTempRaw } = await exec("cat /sys/class/power_supply/battery/temp");
-        document.getElementById('battery-temp').textContent = `${(parseInt(battTempRaw.trim()) / 10).toFixed(1)}°C`;
-
-        const { stdout: memInfoRaw } = await exec("cat /proc/meminfo");
-        const memInfo = parseMemInfo(memInfoRaw);
+        const [
+          cpuBigRaw,
+          cpuFreqRaw,
+          battTempRaw,
+          memInfoRaw
+        ] = await Promise.all([
+          exec("cat /sys/devices/system/cpu/cpufreq/policy4/scaling_cur_freq"),
+          exec("cat /sys/devices/system/cpu/cpufreq/policy0/scaling_cur_freq"),
+          exec("cat /sys/class/power_supply/battery/temp"),
+          exec("cat /proc/meminfo")
+        ]);
+        document.getElementById('cpu-big-clock').textContent =
+          `${Math.round(parseInt(cpuBigRaw.stdout.trim()) / 1000)}MHz`;
+        document.getElementById('cpu-little-clock').textContent =
+          `${Math.round(parseInt(cpuFreqRaw.stdout.trim()) / 1000)}MHz`;
+        document.getElementById('battery-temp').textContent =
+          `${(parseInt(battTempRaw.stdout.trim()) / 10).toFixed(1)}°C`;
+        const memInfo = parseMemInfo(memInfoRaw.stdout);
         const ramUsedPercent = Math.round(((memInfo.MemTotal - memInfo.MemAvailable) / memInfo.MemTotal) * 100);
         document.getElementById('ram-util').textContent = `${ramUsedPercent}%`;
       } catch (err) {
@@ -205,7 +213,10 @@
     // --- Governor Logic ---
     async function loadAvailableGovernors() {
       try {
-        const { stdout } = await exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors");
+        const [{ stdout }, { stdout: current }] = await Promise.all([
+          exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors"),
+          exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
+        ]);
         const governors = stdout.trim().split(/\s+/);
         const select = document.getElementById("governor-select");
         select.innerHTML = "";
@@ -215,7 +226,6 @@
           option.textContent = gov.charAt(0).toUpperCase() + gov.slice(1);
           select.appendChild(option);
         });
-        const { stdout: current } = await exec("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
         select.value = current.trim();
       } catch (err) {
         console.error("Governor loading error:", err);
@@ -229,11 +239,12 @@
       try {
         const { stdout } = await exec("ls -d /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor");
         const cpuGovernorPaths = stdout.trim().split("\n");
-        for (const path of cpuGovernorPaths) {
+        // Run chmod and echo in parallel for all CPUs for speed
+        await Promise.all(cpuGovernorPaths.map(async path => {
           await exec(`chmod 644 ${path}`);
           await exec(`echo ${selectedGovernor} > ${path}`);
           await exec(`chmod 444 ${path}`);
-        }
+        }));
         showToast(`Governor set to ${selectedGovernor}`);
         await updateTweakerConfig("governor", selectedGovernor);
       } catch (err) {
@@ -317,10 +328,12 @@
 
     // --- Event Listeners ---
     document.addEventListener('DOMContentLoaded', async () => {
-      // Initial fetches
+      // Initial fetches (run in parallel for speed)
       fetchDeviceInfo();
-      await loadTweakerConfig();
-      await loadAvailableGovernors();
+      await Promise.all([
+        loadTweakerConfig(),
+        loadAvailableGovernors()
+      ]);
       updateDeviceStats();
       setInterval(updateDeviceStats, 3000);
 
