@@ -1,7 +1,7 @@
 id=tnftweaker
 name=TNF Tweaker
-version=0.5-BETA
+version=0.6-BETA
 versionCode=1
 author=belowzeroiq
-description=Kernel Tweaker for TopNotchFreaks and Zephyr
+description=Simple Kernel Tweaker
 updateJson=
