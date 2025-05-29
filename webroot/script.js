@@ -399,7 +399,6 @@
       if (profileSelect && profileIcon) {
         profileSelect.addEventListener('change', (e) => {
           profileIcon.src = icons[e.target.value] || icons.balanced;
-          showToast(`Profile set to ${e.target.options[e.target.selectedIndex].text}`);
         });
         profileIcon.src = icons[profileSelect.value] || icons.balanced;
       }
