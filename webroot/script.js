@@ -139,7 +139,7 @@
         }
       }
       if (info) {
-        info.textContent = supported ? '' : '! Kernel Profiles not supported';
+        info.textContent = supported ? '' : 'KPM not supported by current kernel !';
       }
     }
 
@@ -286,7 +286,15 @@
     // --- Toast Notification ---
     function showToast(message) {
       const toast = document.getElementById('toast');
+
+      if (message.length > 25) {
+        toast.classList.add('text-xs', 'max-w-xs', 'break-words', 'px-4');
+      } else {
+        toast.classList.remove('text-xs', 'max-w-xs', 'break-words', 'px-4');
+      }
+
       toast.textContent = message;
+
       toast.classList.remove('opacity-0', 'pointer-events-none');
       toast.classList.add('opacity-100');
       clearTimeout(window._toastTimeout);
@@ -391,7 +399,7 @@
               })
               .catch(() => showToast('Failed to apply profile'));
           } else {
-            showToast("kprofiles not supported");
+            showToast("Kernel profiles not supported");
           }
         });
       }
@@ -411,7 +419,7 @@
           const enabled = e.target.checked;
           const result = await setThermalThrottling(enabled);
           thermalStatus.textContent = result ? (enabled ? 'Enabled' : 'Disabled') : 'Failed';
-          showToast('Reboot to apply thermal change');
+          showToast('Reboot to apply thermal changes');
           await updateTweakerConfig("thermal", enabled ? "enabled" : "disabled");
         });
       }
