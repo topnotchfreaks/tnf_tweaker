@@ -129,7 +129,7 @@
     }
 
     function setKProfilesMode(mode) {
-      let value = "3";
+      let value = "2";
       if (mode === "powersave") value = "1";
       else if (mode === "balanced") value = "2";
       else if (mode === "performance") value = "3";
