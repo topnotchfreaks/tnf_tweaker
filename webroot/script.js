@@ -116,7 +116,37 @@
     }
 
     // --- Kernel Profile Logic ---
+    async function isKProfilesSupported() {
+      try {
+        const { stdout, errno } = await exec('cat /sys/kernel/kprofiles/kp_mode');
+        return errno === 0 && !!stdout.trim();
+      } catch {
+        return false;
+      }
+    }
+
+    // Add this function to update the UI with a support message
+    function setKProfilesSupportText(supported) {
+      let info = document.getElementById('kprofiles-support-info');
+      if (!info) {
+        // Insert the info element below the kernel profiles section
+        const container = document.querySelector('.px-6.mt-6');
+        if (container) {
+          info = document.createElement('div');
+          info.id = 'kprofiles-support-info';
+          info.className = 'mt-2 text-xs text-red-400';
+          container.appendChild(info);
+        }
+      }
+      if (info) {
+        info.textContent = supported ? '' : '! Kernel Profiles not supported';
+      }
+    }
+
     async function loadCurrentProfile() {
+      const supported = await isKProfilesSupported();
+      setKProfilesSupportText(supported);
+      if (!supported) return;
       try {
         const { stdout } = await exec('cat /sys/kernel/kprofiles/kp_mode');
         const val = stdout.trim();
@@ -337,6 +367,9 @@
       updateDeviceStats();
       setInterval(updateDeviceStats, 3000);
 
+      // Call loadCurrentProfile instead of just setting UI
+      await loadCurrentProfile();
+
       // Profile logic
       const profileSelect = document.getElementById('profile-select');
       const profileIcon = document.getElementById('profile-icon');
@@ -348,14 +381,18 @@
       };
 
       if (applyProfileBtn && profileSelect) {
-        applyProfileBtn.addEventListener('click', () => {
-          const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
-          setKProfilesMode(profileSelect.value)
-            .then(() => {
-              showToast(`Applied profile: ${selectedText}`);
-              updateTweakerConfig("profile", profileSelect.value);
-            })
-            .catch(() => showToast('Failed to apply profile'));
+        applyProfileBtn.addEventListener('click', async () => {
+          if (await isKProfilesSupported()) {
+            const selectedText = profileSelect.options[profileSelect.selectedIndex].text;
+            setKProfilesMode(profileSelect.value)
+              .then(() => {
+                showToast(`Applied profile: ${selectedText}`);
+                updateTweakerConfig("profile", profileSelect.value);
+              })
+              .catch(() => showToast('Failed to apply profile'));
+          } else {
+            showToast("kprofiles not supported");
+          }
         });
       }
 
