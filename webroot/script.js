@@ -125,11 +125,9 @@
       }
     }
 
-    // Add this function to update the UI with a support message
     function setKProfilesSupportText(supported) {
       let info = document.getElementById('kprofiles-support-info');
       if (!info) {
-        // Insert the info element below the kernel profiles section
         const container = document.querySelector('.px-6.mt-6');
         if (container) {
           info = document.createElement('div');
@@ -204,7 +202,6 @@
     }
 
     async function updateDeviceStats() {
-      // Run all stat fetches in parallel for faster UI update
       try {
         const [
           cpuBigRaw,
@@ -269,7 +266,6 @@
       try {
         const { stdout } = await exec("ls -d /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor");
         const cpuGovernorPaths = stdout.trim().split("\n");
-        // Run chmod and echo in parallel for all CPUs for speed
         await Promise.all(cpuGovernorPaths.map(async path => {
           await exec(`chmod 644 ${path}`);
           await exec(`echo ${selectedGovernor} > ${path}`);
@@ -366,7 +362,6 @@
 
     // --- Event Listeners ---
     document.addEventListener('DOMContentLoaded', async () => {
-      // Initial fetches (run in parallel for speed)
       fetchDeviceInfo();
       await Promise.all([
         loadTweakerConfig(),
@@ -375,10 +370,8 @@
       updateDeviceStats();
       setInterval(updateDeviceStats, 3000);
 
-      // Call loadCurrentProfile instead of just setting UI
       await loadCurrentProfile();
 
-      // Profile logic
       const profileSelect = document.getElementById('profile-select');
       const profileIcon = document.getElementById('profile-icon');
       const applyProfileBtn = document.getElementById('apply-profile');
@@ -411,7 +404,7 @@
         profileIcon.src = icons[profileSelect.value] || icons.balanced;
       }
 
-      // Thermal toggle
+      // --- Thermal Throttling toggle ---
       const thermalToggle = document.getElementById('thermal-toggle');
       const thermalStatus = document.getElementById('thermal-status');
       if (thermalToggle && thermalStatus) {
@@ -424,7 +417,7 @@
         });
       }
 
-      // Bypass Charging toggle
+      // --- Bypass Charging toggle ---
       const chargingToggle = document.getElementById('charging-toggle');
       const chargingStatus = document.getElementById('charging-status');
       if (chargingToggle && chargingStatus) {
@@ -437,10 +430,10 @@
         });
       }
 
-      // Governor apply
+      // --- Governor apply ---
       document.getElementById("apply-governor").addEventListener("click", applyGovernor);
 
-      // Language
+      // --- Language ---
       const langSelect = document.getElementById('lang-select');
       langSelect.addEventListener('change', (e) => {
         updateLanguage(e.target.value);
@@ -450,7 +443,7 @@
       langSelect.value = savedLang;
       updateLanguage(savedLang);
 
-      // Game List
+      // --- Game List ---
       document.getElementById('add-game').addEventListener('click', showAddGameModal);
       document.getElementById('edit-gamelist').addEventListener('click', () => {
         document.getElementById('gamelist-modal').classList.remove('hidden');
@@ -465,7 +458,7 @@
       document.getElementById('save-gamelist').addEventListener('click', saveGameList);
       await loadGameList();
 
-      // Toast for toggles (generic)
+      // --- Toast for toggles (generic) ---
       document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
         if (toggle.id === 'bypass-toggle' || toggle.id === 'thermal-toggle' || toggle.id === 'charging-toggle') return;
         toggle.addEventListener('change', (e) => {
