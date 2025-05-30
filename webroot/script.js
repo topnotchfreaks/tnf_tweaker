@@ -133,11 +133,17 @@
           info = document.createElement('div');
           info.id = 'kprofiles-support-info';
           info.className = 'mt-2 text-xs text-red-400';
+          info.setAttribute('data-i18n', 'kprofiles_support_info');
           container.appendChild(info);
         }
       }
       if (info) {
-        info.textContent = supported ? '' : 'KPM not supported by current kernel !';
+        if (supported) {
+          info.textContent = '';
+        } else {
+          const lang = localStorage.getItem('tnf_lang') || 'en';
+          info.textContent = translations[lang]?.kprofiles_support_info || 'Kernel profiles not supported by current kernel!';
+        }
       }
     }
 

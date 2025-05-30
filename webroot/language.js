@@ -36,7 +36,8 @@ const translations = {
     save: "Save",
     add_game: "Add Game Package",
     package_help: "Enter the game's package name (e.g. com.mobile.legends)",
-    add: "Add"
+    add: "Add",
+    kprofiles_support_info: "Kernel profiles not supported by current kernel!"
   },
   es: {
     kernel_profiles_mode: "Modo de Perfiles del Kernel",
@@ -59,7 +60,8 @@ const translations = {
     save: "Guardar",
     add_game: "Agregar Paquete de Juego",
     package_help: "Ingrese el nombre del paquete del juego (ej. com.mobile.legends)",
-    add: "Agregar"
+    add: "Agregar",
+    kprofiles_support_info: "¡Los perfiles de kernel no son compatibles con el kernel actual!"
   },
   id: {
     kernel_profiles_mode: "Mode Profil Kernel",
@@ -82,7 +84,8 @@ const translations = {
     save: "Simpan",
     add_game: "Tambah Paket Game",
     package_help: "Masukkan nama paket game (misal: com.mobile.legends)",
-    add: "Tambah"
+    add: "Tambah",
+    kprofiles_support_info: "Profil kernel tidak didukung oleh kernel saat ini!"
   },
   ja: {
     kernel_profiles_mode: "カーネルプロファイルモード",
@@ -105,7 +108,8 @@ const translations = {
     save: "保存",
     add_game: "ゲームパッケージを追加",
     package_help: "ゲームのパッケージ名を入力 (例: com.mobile.legends)",
-    add: "追加"
+    add: "追加",
+    kprofiles_support_info: "カーネルプロファイルは現在のカーネルでサポートされていません！"
   },
   pt: {
     kernel_profiles_mode: "Modo de Perfis do Kernel",
@@ -128,7 +132,8 @@ const translations = {
     save: "Salvar",
     add_game: "Adicionar pacote de jogo",
     package_help: "Digite o nome do pacote do jogo (ex: com.mobile.legends)",
-    add: "Adicionar"
+    add: "Adicionar",
+    kprofiles_support_info: "Perfis do kernel não suportados pelo kernel atual!"
   },
   zh: {
     kernel_profiles_mode: "内核配置模式",
@@ -151,7 +156,8 @@ const translations = {
     save: "保存",
     add_game: "添加游戏包",
     package_help: "输入游戏的包名 (例如: com.mobile.legends)",
-    add: "添加"
+    add: "添加",
+    kprofiles_support_info: "当前内核不支持内核配置文件！"
   },
   kr: {
     kernel_profiles_mode: "커널 프로필 모드",
@@ -174,6 +180,7 @@ const translations = {
     save: "저장",
     add_game: "게임 패키지 추가",
     package_help: "게임의 패키지 이름 입력 (예: com.mobile.legends)",
-    add: "추가"
+    add: "추가",
+    kprofiles_support_info: "현재 커널에서 커널 프로필을 지원하지 않습니다!"
   }
 };
