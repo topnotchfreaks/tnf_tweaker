@@ -38,8 +38,6 @@ done
 sleep 5
 
 # Thermal Start Semi-auto Methode
-start logd
-sleep 1
 start android.thermal-hal
 sleep 1
 start vendor.thermal-engine

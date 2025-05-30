@@ -39,8 +39,6 @@ done
 sleep 5
 
 # Thermal Stop Semi-auto Methode
-stop logd
-sleep 1
 stop android.thermal-hal
 sleep 1
 stop vendor.thermal-engine
